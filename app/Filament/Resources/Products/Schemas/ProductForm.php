@@ -36,7 +36,7 @@ class ProductForm
                         TextInput::make('name')
                             ->required()
                             ->maxLength(255)
-                            ->live()
+                            ->live(onBlur: true)
                             ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state)))
                             ->columnSpan(1),
 
@@ -174,7 +174,11 @@ class ProductForm
                     ->collapsible()
                     ->schema([
                         Select::make('modifier_groups')
-                            ->relationship('modifierGroups', 'name')
+                            ->relationship(
+                                name: 'modifierGroups',
+                                titleAttribute: 'name',
+                                modifyQueryUsing: fn ($query) => $query->orderBy('modifier_groups.sort_order'),
+                            )
                             ->multiple()
                             ->searchable()
                             ->preload()

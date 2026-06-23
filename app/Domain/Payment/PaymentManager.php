@@ -6,6 +6,7 @@ use App\Domain\Payment\Contracts\PaymentProvider;
 use App\Domain\Payment\Data\PaymentQr;
 use App\Domain\Payment\Data\PaymentRequest;
 use App\Domain\Payment\Data\PaymentStatus;
+use App\Domain\Shop\Models\Setting;
 use Illuminate\Support\Facades\Log;
 
 class PaymentManager
@@ -70,6 +71,13 @@ class PaymentManager
 
     public function getActiveProviderCode(): string
     {
+        $khqrEnabled = Setting::getValue('payments_khqr_enabled', false);
+        $provider = Setting::getValue('payments_provider', '');
+
+        if ($khqrEnabled && $provider && isset($this->providers[$provider])) {
+            return $provider;
+        }
+
         return config('payment.active_provider', 'cash');
     }
 
@@ -80,8 +88,13 @@ class PaymentManager
 
     public function isKhqrAvailable(): bool
     {
-        $code = $this->getActiveProviderCode();
+        $khqrEnabled = Setting::getValue('payments_khqr_enabled', false);
+        $provider = Setting::getValue('payments_provider', '');
 
-        return isset($this->providers[$code]) && $this->providers[$code]->isAvailable();
+        if (! $khqrEnabled || ! $provider) {
+            return false;
+        }
+
+        return isset($this->providers[$provider]) && $this->providers[$provider]->isAvailable();
     }
 }

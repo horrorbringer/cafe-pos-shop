@@ -39,7 +39,7 @@ class AdjustInventoryAction
 
             if ($newBalance <= $this->lowStockThreshold && $previousBalance > $this->lowStockThreshold) {
                 event(new LowStockDetected(
-                    product: $item->product,
+                    item: $item,
                     currentStock: (int) $newBalance,
                     threshold: $this->lowStockThreshold,
                 ));

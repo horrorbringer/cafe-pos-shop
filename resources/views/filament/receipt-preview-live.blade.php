@@ -16,7 +16,7 @@
 <div class="rounded-xl bg-gray-50 dark:bg-gray-900/50 ring-1 ring-gray-950/5 dark:ring-white/10 overflow-hidden sticky top-4" x-data>
     <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center gap-2">
         <x-filament::icon icon="heroicon-o-eye" class="w-4 h-4 text-gray-400" />
-        <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Receipt Preview</span>
+        <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">{{ __('Receipt Preview') }}</span>
         <span class="text-xs px-1.5 py-0.5 rounded bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 font-mono">{{ $width }}w</span>
         @if($template)
             <span class="text-xs px-1.5 py-0.5 rounded font-medium"
@@ -24,7 +24,7 @@
                 {{ $t['label'] }}
             </span>
         @endif
-        <span class="ml-auto text-xs text-gray-400 animate-pulse">live</span>
+        <span class="ml-auto text-xs text-gray-400 animate-pulse">{{ __('Live') }}</span>
     </div>
     <div class="p-5 flex justify-center">
         <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm" style="max-width:340px;width:100%">
@@ -40,7 +40,7 @@
 <div @style(['text-align:center' => $t['header_align'] === 'center'])>{{ $address }}</div>
 @endif
 @if($showPhone && $phone)
-<div @style(['text-align:center' => $t['header_align'] === 'center'])>{{ 'Tel: '.$phone }}</div>
+<div @style(['text-align:center' => $t['header_align'] === 'center'])>{{ __('Tel:').' '.$phone }}</div>
 @endif
 {{ $outer ?: '' }}
 @if($header)
@@ -49,20 +49,20 @@
 @endif
 @php
     $metaParts = [];
-    if ($showOrderType) $metaParts[] = 'Type: Dine-in';
-    if ($showTable) $metaParts[] = 'Table: 5';
+    if ($showOrderType) $metaParts[] = __('Type').': '.($orderType ?? 'Dine-in');
+    if ($showTable) $metaParts[] = __('Table').': '.($orderTable ?? '5');
     $metaLine = implode('  ', $metaParts);
 @endphp
-Order #: ORD-20260623-0001{{ $tight ? ' | ' : "\n" }}Date: 23 Jun 2026, 14:30
+{{ __('Order #') }}: {{ $orderNumber ?? 'PREVIEW' }}{{ $tight ? ' | ' : "\n" }}{{ __('Date') }}: {{ $orderDate ?? now()->format('d M Y, H:i') }}
 @if($metaLine)
 {{ $metaLine }}
 @endif
 @if($showCashier)
-Cashier: Admin
+{{ __('Cashier') }}: {{ $cashierName ?? 'Admin' }}
 @endif
 {{ $gap }}
 {{ $inner }}
-QTY  ITEM                    PRICE
+{{ __('QTY') }}  {{ __('ITEM') }}{{ str_repeat(' ', max(1, $width - 14 - mb_strlen(__('ITEM')) - mb_strlen(__('PRICE')))) }}{{ __('PRICE') }}
 {{ $inner }}
 1x   Cold Brew Latte         4.50
 2x   Blueberry Muffin        7.00
@@ -71,17 +71,21 @@ QTY  ITEM                    PRICE
 @endif
 1x   Espresso                3.00
 {{ $inner }}
-{{ $tight ? '' : "\n" }}Subtotal                    14.50
+{{ $tight ? '' : "\n" }}{{ __('Subtotal') }}{{ str_repeat(' ', max(1, $width - 9 - mb_strlen(__('Subtotal')))) }}14.50
 @if($showDiscount)
-Discount                   -1.45
+{{ __('Discount') }}{{ str_repeat(' ', max(1, $width - 9 - mb_strlen(__('Discount')))) }}-1.45
 @endif
-Tax                         1.31
+{{ __('Tax') }}{{ str_repeat(' ', max(1, $width - 3 - mb_strlen(__('Tax')))) }}1.31
 {{ $inner }}
-TOTAL                      14.36
+{{ __('Total') }}{{ str_repeat(' ', max(1, $width - 5 - mb_strlen(__('Total')))) }}14.36
 {{ $inner }}
 @if($showPayment)
-Paid                        20.00
-Change                      5.64
+{{ __('Paid') }}{{ str_repeat(' ', max(1, $width - 4 - mb_strlen(__('Paid')))) }}20.00
+{{ __('Change') }}{{ str_repeat(' ', max(1, $width - 6 - mb_strlen(__('Change')))) }}5.64
+@endif
+@if($showNotes && !empty($sampleNotes))
+{{ $inner }}
+{{ __('Notes') }}: {{ $sampleNotes }}
 @endif
 @if($footer)
 {{ $inner }}

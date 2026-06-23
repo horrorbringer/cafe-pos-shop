@@ -49,7 +49,7 @@ class SettingsPage extends Page
 
     public ?string $shopPhone = null;
 
-    public ?string $shopLogo = null;
+    public array $shopLogo = [];
 
     public ?string $shopCurrency = null;
 
@@ -68,6 +68,12 @@ class SettingsPage extends Page
     public ?string $receiptPrinter = null;
 
     public ?string $receiptTemplate = 'classic';
+
+    public ?string $receiptPrinterIp = null;
+
+    public ?int $receiptPrinterPort = 9100;
+
+    public ?string $receiptPrinterEncoding = 'CP437';
 
     public bool $receiptShowAddress = true;
 
@@ -99,7 +105,8 @@ class SettingsPage extends Page
         $this->shopName = Setting::getValue('shop_name', '');
         $this->shopAddress = Setting::getValue('shop_address', '');
         $this->shopPhone = Setting::getValue('shop_phone', '');
-        $this->shopLogo = Setting::getValue('shop_logo', '');
+        $logo = Setting::getValue('shop_logo', '');
+        $this->shopLogo = $logo ? [$logo] : [];
         $this->shopCurrency = Setting::getValue('shop_currency', 'USD');
         $this->shopTaxRate = (float) Setting::getValue('shop_tax_rate', 0);
 
@@ -111,6 +118,9 @@ class SettingsPage extends Page
         $this->receiptFooter = Setting::getValue('receipt_footer', '');
         $this->receiptPrinter = Setting::getValue('receipt_printer', '');
         $this->receiptTemplate = Setting::getValue('receipt_template', 'classic');
+        $this->receiptPrinterIp = Setting::getValue('receipt_printer_ip', '');
+        $this->receiptPrinterPort = (int) Setting::getValue('receipt_printer_port', 9100);
+        $this->receiptPrinterEncoding = Setting::getValue('receipt_printer_encoding', 'CP437');
         $this->receiptShowAddress = Setting::getValue('receipt_show_address', true);
         $this->receiptShowPhone = Setting::getValue('receipt_show_phone', true);
         $this->receiptShowLogo = Setting::getValue('receipt_show_logo', false);
@@ -159,7 +169,6 @@ class SettingsPage extends Page
                                         FileUpload::make('shopLogo')
                                             ->label('Logo')
                                             ->image()
-                                            ->imageEditor()
                                             ->directory('logos')
                                             ->maxSize(2048)
                                             ->columnSpanFull(),
@@ -171,7 +180,7 @@ class SettingsPage extends Page
                                                 'KHR' => 'KHR (៛)',
                                                 'EUR' => 'EUR (€)',
                                                 'GBP' => 'GBP (£)',
-                                                'THB' => 'THB (฿)',
+
                                             ])
                                             ->default('USD')
                                             ->required()
@@ -210,9 +219,7 @@ class SettingsPage extends Page
                                         Select::make('paymentsProvider')
                                             ->label('KHQR Provider')
                                             ->options([
-                                                'aba' => 'ABA Pay',
-                                                'wing' => 'Wing',
-                                                'acleda' => 'ACLEDA Bank',
+                                                'bakong' => 'Bakong (NBC)',
                                             ])
                                             ->placeholder('None')
                                             ->nullable()
@@ -308,8 +315,7 @@ class SettingsPage extends Page
                                                             ->default('classic')
                                                             ->helperText('Classic: Standard borders. Minimal: Clean no borders. Detailed: Full info with thick borders. Compact: Tight for thermal. Branded: Decorative with logo.')
                                                             ->live()
-                                                            ->native(false)
-                                                            ->afterStateUpdated(fn () => $this->saveReceipt()),
+                                                            ->native(false),
 
                                                         Select::make('receiptPrinter')
                                                             ->label('Paper Width')
@@ -320,8 +326,7 @@ class SettingsPage extends Page
                                                             ])
                                                             ->default('default')
                                                             ->helperText('Wider formats show more columns.')
-                                                            ->live()
-                                                            ->afterStateUpdated(fn () => $this->saveReceipt()),
+                                                            ->live(),
 
                                                         Action::make('printTest')
                                                             ->label('Print Test')
@@ -332,6 +337,43 @@ class SettingsPage extends Page
                                                             ->url(fn () => route('admin.test-receipt'), shouldOpenInNewTab: true),
                                                     ]),
 
+                                                Section::make('Thermal Printer')
+                                                    ->icon(Heroicon::OutlinedServerStack)
+                                                    ->compact()
+                                                    ->columns(3)
+                                                    ->schema([
+                                                        TextInput::make('receiptPrinterIp')
+                                                            ->label('Printer IP Address')
+                                                            ->placeholder('192.168.1.100')
+                                                            ->helperText('Network printer IP for direct ESC/POS printing.')
+                                                            ->live()
+                                                            ->afterStateUpdated(fn () => $this->saveReceipt()),
+
+                                                        TextInput::make('receiptPrinterPort')
+                                                            ->label('Port')
+                                                            ->numeric()
+                                                            ->default(9100)
+                                                            ->minValue(1)
+                                                            ->maxValue(65535)
+                                                            ->helperText('Typically 9100 for ESC/POS.')
+                                                            ->live()
+                                                            ->afterStateUpdated(fn () => $this->saveReceipt()),
+
+                                                        Select::make('receiptPrinterEncoding')
+                                                            ->label('Encoding')
+                                                            ->options([
+                                                                'CP437' => 'CP437 (US/Europe)',
+                                                                'CP850' => 'CP850 (Multilingual)',
+                                                                'CP857' => 'CP857 (Turkish)',
+                                                                'CP858' => 'CP858 (Euro)',
+                                                                'CP874' => 'CP874 (Thai)',
+                                                                'CP1252' => 'CP1252 (Western)',
+                                                            ])
+                                                            ->default('CP437')
+                                                            ->helperText('Character encoding for your printer.')
+                                                            ->live(),
+                                                    ]),
+
                                                 Section::make('Show on Receipt')
                                                     ->icon(Heroicon::OutlinedEye)
                                                     ->compact()
@@ -340,62 +382,52 @@ class SettingsPage extends Page
                                                         Checkbox::make('receiptShowAddress')
                                                             ->label('Address')
                                                             ->default(true)
-                                                            ->live()
-                                                            ->afterStateUpdated(fn () => $this->saveReceipt()),
+                                                            ->live(),
 
                                                         Checkbox::make('receiptShowPhone')
                                                             ->label('Phone')
                                                             ->default(true)
-                                                            ->live()
-                                                            ->afterStateUpdated(fn () => $this->saveReceipt()),
+                                                            ->live(),
 
                                                         Checkbox::make('receiptShowLogo')
                                                             ->label('Logo')
                                                             ->default(false)
-                                                            ->live()
-                                                            ->afterStateUpdated(fn () => $this->saveReceipt()),
+                                                            ->live(),
 
                                                         Checkbox::make('receiptShowOrderType')
                                                             ->label('Type')
                                                             ->default(true)
-                                                            ->live()
-                                                            ->afterStateUpdated(fn () => $this->saveReceipt()),
+                                                            ->live(),
 
                                                         Checkbox::make('receiptShowTable')
                                                             ->label('Table')
                                                             ->default(true)
-                                                            ->live()
-                                                            ->afterStateUpdated(fn () => $this->saveReceipt()),
+                                                            ->live(),
 
                                                         Checkbox::make('receiptShowCashier')
                                                             ->label('Cashier')
                                                             ->default(true)
-                                                            ->live()
-                                                            ->afterStateUpdated(fn () => $this->saveReceipt()),
+                                                            ->live(),
 
                                                         Checkbox::make('receiptShowModifiers')
                                                             ->label('Options')
                                                             ->default(true)
-                                                            ->live()
-                                                            ->afterStateUpdated(fn () => $this->saveReceipt()),
+                                                            ->live(),
 
                                                         Checkbox::make('receiptShowDiscount')
                                                             ->label('Discount')
                                                             ->default(true)
-                                                            ->live()
-                                                            ->afterStateUpdated(fn () => $this->saveReceipt()),
+                                                            ->live(),
 
                                                         Checkbox::make('receiptShowPayment')
                                                             ->label('Payment')
                                                             ->default(true)
-                                                            ->live()
-                                                            ->afterStateUpdated(fn () => $this->saveReceipt()),
+                                                            ->live(),
 
                                                         Checkbox::make('receiptShowNotes')
                                                             ->label('Notes')
                                                             ->default(true)
-                                                            ->live()
-                                                            ->afterStateUpdated(fn () => $this->saveReceipt()),
+                                                            ->live(),
                                                     ]),
 
                                                 Section::make('Header & Footer')
@@ -408,8 +440,7 @@ class SettingsPage extends Page
                                                             ->maxLength(500)
                                                             ->placeholder('Welcome to Our Cafe!')
                                                             ->helperText('Appears after shop details.')
-                                                            ->live(debounce: 500)
-                                                            ->afterStateUpdated(fn () => $this->saveReceipt()),
+                                                            ->live(debounce: 500),
 
                                                         Textarea::make('receiptFooter')
                                                             ->label('Custom Footer')
@@ -417,8 +448,7 @@ class SettingsPage extends Page
                                                             ->maxLength(500)
                                                             ->placeholder('Thank you for your visit!')
                                                             ->helperText('Appears before the closing line.')
-                                                            ->live(debounce: 500)
-                                                            ->afterStateUpdated(fn () => $this->saveReceipt()),
+                                                            ->live(debounce: 500),
                                                     ]),
                                             ]),
 
@@ -446,7 +476,12 @@ class SettingsPage extends Page
             'shopName' => $this->shopName ?? 'My Cafe',
             'address' => $this->shopAddress ?? '',
             'phone' => $this->shopPhone ?? '',
-            'logoUrl' => $this->shopLogo ? Storage::url($this->shopLogo) : null,
+            'orderNumber' => 'ORD-PREVIEW',
+            'orderDate' => now()->format('d M Y, H:i'),
+            'orderType' => 'Dine-in',
+            'orderTable' => '5',
+            'cashierName' => 'Admin',
+            'logoUrl' => ! empty($this->shopLogo[0]) ? Storage::url($this->shopLogo[0]) : null,
             'header' => $this->receiptHeader ?? '',
             'footer' => $this->receiptFooter ?? '',
             'showAddress' => $this->receiptShowAddress ?? true,
@@ -459,6 +494,7 @@ class SettingsPage extends Page
             'showDiscount' => $this->receiptShowDiscount ?? true,
             'showPayment' => $this->receiptShowPayment ?? true,
             'showNotes' => $this->receiptShowNotes ?? true,
+            'sampleNotes' => 'Please bring to table 5',
         ])->render();
     }
 
@@ -468,6 +504,9 @@ class SettingsPage extends Page
         Setting::setValue('receipt_footer', $this->receiptFooter, 'string');
         Setting::setValue('receipt_printer', $this->receiptPrinter, 'string');
         Setting::setValue('receipt_template', $this->receiptTemplate, 'string');
+        Setting::setValue('receipt_printer_ip', $this->receiptPrinterIp, 'string');
+        Setting::setValue('receipt_printer_port', (string) $this->receiptPrinterPort, 'integer');
+        Setting::setValue('receipt_printer_encoding', $this->receiptPrinterEncoding, 'string');
         Setting::setValue('receipt_show_address', $this->receiptShowAddress ? '1' : '0', 'boolean');
         Setting::setValue('receipt_show_phone', $this->receiptShowPhone ? '1' : '0', 'boolean');
         Setting::setValue('receipt_show_logo', $this->receiptShowLogo ? '1' : '0', 'boolean');
@@ -485,7 +524,7 @@ class SettingsPage extends Page
         Setting::setValue('shop_name', $this->shopName, 'string');
         Setting::setValue('shop_address', $this->shopAddress, 'string');
         Setting::setValue('shop_phone', $this->shopPhone, 'string');
-        Setting::setValue('shop_logo', $this->shopLogo, 'string');
+        Setting::setValue('shop_logo', $this->shopLogo[0] ?? '', 'string');
         Setting::setValue('shop_currency', $this->shopCurrency, 'string');
         Setting::setValue('shop_tax_rate', (string) $this->shopTaxRate, 'float');
 

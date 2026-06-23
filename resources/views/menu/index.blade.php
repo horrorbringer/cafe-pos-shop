@@ -148,7 +148,8 @@
                                 x-transition:enter="transition ease-out duration-200"
                                 x-transition:enter-start="opacity-0 scale-95"
                                 x-transition:enter-end="opacity-100 scale-100"
-                                class="rounded-xl overflow-hidden"
+                                @click="openModal({{ $product->id }})"
+                                class="rounded-xl overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
                                 :class="darkMode ? 'bg-gray-800' : 'bg-white shadow-sm ring-1 ring-gray-200'">
 
                                 <div class="flex">
@@ -293,6 +294,111 @@
         </div>
     </div>
 
+    {{-- Product Detail Modal --}}
+    <div x-show="showModal" x-cloak
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        @click.self="closeModal()"
+        @keydown.escape.window="closeModal()"
+        class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm"
+        style="overscroll-behavior: contain;">
+
+        <div x-show="showModal" x-cloak
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="translate-y-full sm:scale-95 sm:translate-y-0 opacity-0"
+            x-transition:enter-end="translate-y-0 sm:scale-100 opacity-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="translate-y-0 sm:scale-100 opacity-100"
+            x-transition:leave-end="translate-y-full sm:scale-95 sm:translate-y-0 opacity-0"
+            class="w-full sm:max-w-sm bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+            :class="darkMode ? 'bg-gray-800' : 'bg-white'">
+
+            {{-- Modal Image --}}
+            <div class="relative aspect-[4/3] bg-gray-100 shrink-0" :class="darkMode ? 'bg-gray-700' : 'bg-gray-100'">
+                <template x-if="selectedProduct?.image">
+                    <img :src="selectedProduct.image" :alt="selectedProduct.name" class="w-full h-full object-cover">
+                </template>
+                <template x-if="!selectedProduct?.image">
+                    <div class="w-full h-full flex items-center justify-center" :class="darkMode ? 'bg-gray-700' : 'bg-gray-50'">
+                        <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                </template>
+                <button @click="closeModal()" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+                <template x-if="selectedProduct && !selectedProduct.is_available">
+                    <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
+                        <span class="text-white text-sm font-bold uppercase tracking-wider" x-text="lang === 'en' ? 'Sold Out' : 'បានលក់អស់'"></span>
+                    </div>
+                </template>
+            </div>
+
+            {{-- Modal Body --}}
+            <div class="flex-1 overflow-y-auto p-5">
+                <div class="flex items-start justify-between gap-3 mb-2">
+                    <h2 class="text-lg font-bold leading-tight" :class="darkMode ? 'text-white' : 'text-gray-900'" x-text="selectedProduct?.name"></h2>
+                    <template x-if="selectedProduct?.tags?.length">
+                        <div class="flex flex-wrap gap-1 shrink-0">
+                            <template x-for="tag in selectedProduct.tags" :key="tag">
+                                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded"
+                                    :class="tag === 'new' ? 'bg-blue-100 text-blue-700' : (tag === 'popular' ? 'bg-orange-100 text-orange-700' : (tag === 'signature' ? 'bg-purple-100 text-purple-700' : ''))"
+                                    x-text="tag.toUpperCase()"></span>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+
+                <p x-show="selectedProduct?.description" class="text-sm leading-relaxed mb-3" :class="darkMode ? 'text-gray-400' : 'text-gray-500'" x-text="selectedProduct?.description"></p>
+
+                {{-- Allergens & Calories --}}
+                <div x-show="selectedProduct?.calories || selectedProduct?.allergens?.length" class="flex items-center gap-2 flex-wrap mb-3">
+                    <span x-show="selectedProduct?.calories" class="text-xs font-medium px-2 py-0.5 rounded bg-green-50 text-green-600 border border-green-100" x-text="selectedProduct?.calories + ' kcal'"></span>
+                    <template x-for="allergen in (selectedProduct?.allergens || [])" :key="allergen">
+                        <span class="text-xs px-2 py-0.5 rounded bg-yellow-50 text-yellow-600 border border-yellow-100" x-text="allergen"></span>
+                    </template>
+                </div>
+
+                {{-- Price --}}
+                <div class="text-2xl font-bold mb-4" :style="{ color: primaryColor }">
+                    <span x-show="selectedProduct?.has_price_range" x-text="'$' + Number(selectedProduct?.min_price).toFixed(2) + ' – $' + Number(selectedProduct?.max_price).toFixed(2)"></span>
+                    <span x-show="!selectedProduct?.has_price_range" x-text="'$' + Number(selectedProduct?.price).toFixed(2)"></span>
+                </div>
+
+                {{-- Variants --}}
+                <template x-if="selectedProduct?.variants?.length > 1">
+                    <div class="mb-4">
+                        <h4 class="text-xs font-semibold uppercase tracking-wider mb-2" :class="darkMode ? 'text-gray-400' : 'text-gray-500'" x-text="lang === 'en' ? 'Available Options' : 'ជម្រើស'"></h4>
+                        <div class="flex flex-wrap gap-2">
+                            <template x-for="variant in selectedProduct.variants" :key="variant.id">
+                                <span class="text-sm px-3 py-1.5 rounded-lg font-medium border" :class="darkMode ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-gray-50 border-gray-200 text-gray-700'"
+                                    x-text="variant.name + ' ($' + Number(variant.price ?? selectedProduct.price).toFixed(2) + ')'"></span>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+
+                {{-- Order Button --}}
+                <button x-show="whatasappNumber && selectedProduct?.is_available"
+                    @click="window.open('https://wa.me/' + whatasappNumber + '?text=' + encodeURIComponent('I want to order: ' + selectedProduct.name), '_blank')"
+                    class="w-full py-3 rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2 hover:opacity-90 transition-all active:scale-[0.98]"
+                    style="background: #25D366">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    <span x-text="lang === 'en' ? 'Order via WhatsApp' : 'បញ្ជាទិញតាម WhatsApp'"></span>
+                </button>
+
+                <p x-show="!whatasappNumber && selectedProduct?.is_available" class="text-center text-sm py-3" :class="darkMode ? 'text-gray-400' : 'text-gray-500'">
+                    <span x-text="lang === 'en' ? 'Ask at the counter to place your order' : 'សូមសួរនៅកន្លែងលក់ដើម្បីបញ្ជាទិញ'"></span>
+                </p>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('menuApp', () => ({
@@ -312,7 +418,22 @@
                 enableKhmer: @js((bool) ($menuSettings['enable_khmer'] ?? false)),
                 tableId: @js($tableId),
                 supportsShare: typeof navigator.share === 'function',
+                whatasappNumber: @js($menuSettings['whatsapp_number'] ?? ''),
                 products: @json($productsJson),
+                showModal: false,
+                selectedProduct: null,
+
+                openModal(productId) {
+                    this.selectedProduct = this.products.find(p => p.id === productId) ?? null;
+                    this.showModal = true;
+                    document.body.style.overflow = 'hidden';
+                },
+
+                closeModal() {
+                    this.showModal = false;
+                    this.selectedProduct = null;
+                    document.body.style.overflow = '';
+                },
 
                 matchesSearch(productId) {
                     const product = this.products.find(p => p.id === productId);

@@ -24,6 +24,7 @@ class RoleSeeder extends Seeder
             'view pos',
             'create orders',
             'process payments',
+            'manage orders',
             'cancel orders',
             'view order history',
 
@@ -69,6 +70,7 @@ class RoleSeeder extends Seeder
             'view pos',
             'create orders',
             'process payments',
+            'manage orders',
             'cancel orders',
             'view order history',
             'view categories',

@@ -20,9 +20,9 @@ class BranchResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingStorefront;
 
-    protected static ?int $navigationSort = 2;
+    protected static bool $shouldRegisterNavigation = true;
 
-    protected static bool $shouldRegisterNavigation = false;
+    protected static ?int $navigationSort = 5;
 
     public static function canAccess(): bool
     {
@@ -31,7 +31,7 @@ class BranchResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Operations';
+        return 'Settings';
     }
 
     public static function form(Schema $schema): Schema

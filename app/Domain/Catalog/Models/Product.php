@@ -61,9 +61,7 @@ class Product extends Model
 
     public function modifierGroups(): BelongsToMany
     {
-        return $this->belongsToMany(ModifierGroup::class, 'product_modifier_groups')
-            ->withPivot('sort_order')
-            ->orderBy('sort_order');
+        return $this->belongsToMany(ModifierGroup::class, 'product_modifier_groups');
     }
 
     public function getMinPriceAttribute(): float

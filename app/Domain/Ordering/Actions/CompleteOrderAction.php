@@ -2,6 +2,7 @@
 
 namespace App\Domain\Ordering\Actions;
 
+use App\Domain\Inventory\Actions\DeductInventoryAction;
 use App\Domain\Notifications\Events\OrderPaid;
 use App\Domain\Ordering\Models\Order;
 use App\Domain\Shared\Enums\OrderStatus;
@@ -12,6 +13,7 @@ class CompleteOrderAction
 {
     public function __construct(
         protected TransitionOrderStatusAction $transitionStatus,
+        protected DeductInventoryAction $deductInventory,
     ) {}
 
     public function execute(Order $order, User $user): Order
@@ -24,10 +26,12 @@ class CompleteOrderAction
                 'Order completed',
             );
 
+            $this->deductInventory->execute($order);
+
             event(new OrderPaid(
                 order: $order,
                 amountPaid: $order->amount_paid,
-                paymentMethod: $order->payments()->latest()->first()?->method ?? 'unknown',
+                paymentMethod: $order->payments()->latest()->first()?->method?->value ?? 'unknown',
             ));
 
             return $order;

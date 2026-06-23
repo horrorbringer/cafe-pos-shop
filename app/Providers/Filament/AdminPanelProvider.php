@@ -6,6 +6,7 @@ use App\Filament\Widgets\DailySales;
 use App\Filament\Widgets\LowStockAlert;
 use App\Filament\Widgets\SalesChart;
 use App\Filament\Widgets\TopProducts;
+use App\Http\Middleware\SetLocale;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -65,6 +66,20 @@ class AdminPanelProvider extends PanelProvider
                     ->group('Orders')
                     ->sort(0)
                     ->isActiveWhen(fn () => request()->is('pos*')),
+
+                NavigationItem::make('English')
+                    ->url(fn (): string => route('language.switch', 'en'))
+                    ->icon('heroicon-o-language')
+                    ->group('Settings')
+                    ->sort(20)
+                    ->visible(fn (): bool => app()->getLocale() !== 'en'),
+
+                NavigationItem::make('Khmer')
+                    ->url(fn (): string => route('language.switch', 'km'))
+                    ->icon('heroicon-o-language')
+                    ->group('Settings')
+                    ->sort(21)
+                    ->visible(fn (): bool => app()->getLocale() !== 'km'),
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -76,6 +91,7 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                SetLocale::class,
             ])
             ->authMiddleware([
                 Authenticate::class,

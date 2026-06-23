@@ -19,8 +19,6 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Livewire\Attributes\Url;
 
 class MenuManagement extends Page implements HasTable
@@ -68,19 +66,14 @@ class MenuManagement extends Page implements HasTable
 
     public function table(Table $table): Table
     {
-        return match ($this->activeTab) {
-            'products' => ProductsTable::configure($table),
-            'categories' => CategoriesTable::configure($table),
-            default => $table,
+        $tab = match (strtolower($this->activeTab ?? '')) {
+            'categories' => 'categories',
+            default => 'products',
         };
-    }
 
-    protected function getTableQuery(): Builder|Relation|null
-    {
-        return match ($this->activeTab) {
-            'products' => Product::query(),
-            'categories' => Category::query(),
-            default => null,
+        return match ($tab) {
+            'categories' => CategoriesTable::configure($table->query(Category::query())),
+            default => ProductsTable::configure($table->query(Product::query())),
         };
     }
 

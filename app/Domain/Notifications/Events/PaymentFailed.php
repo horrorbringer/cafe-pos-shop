@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Notifications\Events;
 
-use App\Models\Order;
+use App\Domain\Ordering\Models\Order;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 

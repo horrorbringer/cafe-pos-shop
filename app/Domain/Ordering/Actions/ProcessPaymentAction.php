@@ -145,6 +145,16 @@ class ProcessPaymentAction
             return null;
         }
 
+        // Transition Draft → Pending before creating the QR payment
+        if ($order->status === OrderStatus::Draft) {
+            $this->transitionStatus->execute(
+                $order,
+                OrderStatus::Pending,
+                $user?->id,
+                'KHQR payment initiated',
+            );
+        }
+
         $request = new PaymentRequest(
             orderNumber: $order->order_number,
             amount: $order->total,

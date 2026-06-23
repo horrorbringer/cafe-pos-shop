@@ -36,7 +36,6 @@ class ReceiptTestController
             'KHR' => '៛',
             'EUR' => '€',
             'GBP' => '£',
-            'THB' => '฿',
             default => '$',
         };
 

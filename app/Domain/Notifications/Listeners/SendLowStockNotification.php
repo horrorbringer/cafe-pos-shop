@@ -25,7 +25,7 @@ class SendLowStockNotification implements ShouldQueue
 
         if ($rules->isEmpty()) {
             Log::info('No enabled rules for low_stock event', [
-                'product_id' => $event->product->id,
+                'item_id' => $event->item->id,
             ]);
 
             return;
@@ -33,7 +33,7 @@ class SendLowStockNotification implements ShouldQueue
 
         if ($event->currentStock > $event->threshold) {
             Log::info('Stock level above notification threshold', [
-                'product_id' => $event->product->id,
+                'item_id' => $event->item->id,
                 'current_stock' => $event->currentStock,
                 'threshold' => $event->threshold,
             ]);
@@ -53,7 +53,7 @@ class SendLowStockNotification implements ShouldQueue
                     Log::info('Notification skipped due to cooldown', [
                         'event' => 'low_stock',
                         'channel' => $channelCode,
-                        'product_id' => $event->product->id,
+                        'item_id' => $event->item->id,
                     ]);
 
                     continue;
@@ -70,8 +70,8 @@ class SendLowStockNotification implements ShouldQueue
                         recipient: $recipient->destination,
                         status: 'sent',
                         payload: [
-                            'product_id' => $event->product->id,
-                            'product_name' => $event->product->name,
+                            'item_id' => $event->item->id,
+                            'item_name' => $event->item->name,
                             'current_stock' => $event->currentStock,
                             'threshold' => $event->threshold,
                         ],
@@ -81,7 +81,7 @@ class SendLowStockNotification implements ShouldQueue
                 Log::error('Failed to send low_stock notification', [
                     'event' => 'low_stock',
                     'channel' => $channelCode,
-                    'product_id' => $event->product->id,
+                    'item_id' => $event->item->id,
                     'error' => $e->getMessage(),
                 ]);
 
@@ -108,13 +108,13 @@ class SendLowStockNotification implements ShouldQueue
     protected function sendEmail(LowStockDetected $event, object $recipient): void
     {
         $message = "Low Stock Alert\n\n"
-            ."Product: {$event->product->name}\n"
+            ."Item: {$event->item->name}\n"
             ."Current Stock: {$event->currentStock}\n"
             ."Threshold: {$event->threshold}";
 
         $this->emailChannel->send(
             $recipient->destination,
-            'Low Stock - '.$event->product->name,
+            'Low Stock - '.$event->item->name,
             $message,
         );
     }
@@ -122,7 +122,7 @@ class SendLowStockNotification implements ShouldQueue
     protected function sendTelegram(LowStockDetected $event, object $recipient): void
     {
         $message = "<b>Low Stock Alert</b>\n"
-            ."\nProduct: {$event->product->name}"
+            ."\nItem: {$event->item->name}"
             ."\nCurrent Stock: {$event->currentStock}"
             ."\nThreshold: {$event->threshold}";
 

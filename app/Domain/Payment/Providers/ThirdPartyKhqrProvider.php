@@ -60,7 +60,7 @@ class ThirdPartyKhqrProvider implements PaymentProvider
         $data = $response->json('data', $response->json());
 
         return new PaymentQr(
-            providerReference: $data['reference_id'] ?? uniq('khqr_'),
+            providerReference: $data['reference_id'] ?? uniqid('khqr_'),
             qrData: $data['qr_data'] ?? $data['qr'] ?? '',
             qrImageUrl: $data['qr_image_url'] ?? $data['qr_url'] ?? '',
             amount: $request->amount,

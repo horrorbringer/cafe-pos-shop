@@ -4,6 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ config('app.name', 'POS Cafe') }}</title>
+    @if(app()->getLocale() === 'km')
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    @endif
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gradient-to-br from-amber-50 via-white to-orange-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 min-h-screen antialiased">
@@ -14,16 +19,17 @@
                     {{ config('app.name', 'POS Cafe') }}
                 </a>
                 <nav class="flex items-center gap-4">
+                    <x-language-switcher />
                     <a href="/menu" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors">
-                        Digital Menu
+                        {{ __('Digital Menu') }}
                     </a>
                     @auth
                         <a href="/admin" class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold bg-amber-600 text-white hover:bg-amber-700 transition-colors">
-                            Dashboard
+                            {{ __('Dashboard') }}
                         </a>
                     @else
                         <a href="/admin/login" class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold bg-amber-600 text-white hover:bg-amber-700 transition-colors">
-                            Staff Login
+                            {{ __('Staff Login') }}
                         </a>
                     @endauth
                 </nav>
@@ -39,11 +45,11 @@
                         </svg>
                     </div>
                     <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white tracking-tight mb-4">
-                        Welcome to
+                        {{ __('Welcome to') }}
                         <span class="text-amber-600 dark:text-amber-400">{{ config('app.name', 'POS Cafe') }}</span>
                     </h1>
                     <p class="text-lg sm:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
-                        Your all-in-one point of sale system. Manage orders, inventory, and serve your customers with ease.
+                        {{ __('Your all-in-one point of sale system. Manage orders, inventory, and serve your customers with ease.') }}
                     </p>
                 </div>
 
@@ -54,8 +60,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
                             </svg>
                         </div>
-                        <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Digital Menu</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Browse our menu and place orders</p>
+                        <h3 class="font-semibold text-gray-900 dark:text-white mb-1">{{ __('Digital Menu') }}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Browse our menu and place orders') }}</p>
                     </a>
 
                     <a href="/admin" class="group p-6 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-amber-300 dark:hover:border-amber-700 shadow-sm hover:shadow-md transition-all">
@@ -64,8 +70,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
                         </div>
-                        <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Dashboard</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Manage orders, inventory, and reports</p>
+                        <h3 class="font-semibold text-gray-900 dark:text-white mb-1">{{ __('Dashboard') }}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Manage orders, inventory, and reports') }}</p>
                     </a>
 
                     <a href="/pos" class="group p-6 rounded-xl bg-amber-600 text-white hover:bg-amber-700 shadow-md hover:shadow-lg transition-all">
@@ -74,8 +80,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/>
                             </svg>
                         </div>
-                        <h3 class="font-semibold mb-1">POS Terminal</h3>
-                        <p class="text-sm text-amber-100">Process orders and take payments</p>
+                        <h3 class="font-semibold mb-1">{{ __('POS Terminal') }}</h3>
+                        <p class="text-sm text-amber-100">{{ __('Process orders and take payments') }}</p>
                     </a>
                 </div>
             </div>

@@ -2,6 +2,7 @@
 
 namespace App\Domain\Ordering\Actions;
 
+use App\Domain\Inventory\Actions\RestoreInventoryAction;
 use App\Domain\Notifications\Events\RefundVoided;
 use App\Domain\Ordering\Models\Order;
 use App\Domain\Shared\Enums\OrderStatus;
@@ -12,6 +13,7 @@ class RefundOrderAction
 {
     public function __construct(
         protected TransitionOrderStatusAction $transitionStatus,
+        protected RestoreInventoryAction $restoreInventory,
     ) {}
 
     public function execute(Order $order, User $user, string $reason): Order
@@ -33,10 +35,12 @@ class RefundOrderAction
         return DB::transaction(function () use ($order, $user, $reason) {
             $totalPaid = $order->payments()->where('status', 'paid')->sum('amount');
 
+            $this->restoreInventory->execute($order);
+
             // Create refund payment record (negative amount)
             $order->payments()->create([
                 'provider_code' => 'refund',
-                'method' => 'refund',
+                'method' => 'other',
                 'amount' => -$totalPaid,
                 'currency' => config('payment.khqr.default_currency', 'USD'),
                 'status' => 'refunded',
@@ -60,8 +64,9 @@ class RefundOrderAction
 
             event(new RefundVoided(
                 order: $order,
-                amountRefunded: $totalPaid,
+                user: $user,
                 reason: $reason,
+                type: 'refund',
             ));
 
             return $order;

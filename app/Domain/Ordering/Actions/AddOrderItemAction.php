@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\DB;
 
 class AddOrderItemAction
 {
+    public function __construct(
+        protected RecalculateOrderTotalsAction $recalculateOrder,
+    ) {}
+
     public function execute(
         Order $order,
         Product $product,
@@ -57,7 +61,7 @@ class AddOrderItemAction
             // Decrement product/variant stock
             $this->decrementStock($product, $variant, $quantity);
 
-            $this->recalculateOrder($order);
+            $this->recalculateOrder->execute($order);
 
             return $item;
         });
@@ -65,8 +69,9 @@ class AddOrderItemAction
 
     private function getAvailableStock(Product $product, ?ProductVariant $variant): int
     {
+        // Stock is tracked through ProductIngredient → InventoryItem, not at variant level
         if ($variant) {
-            return $variant->stock_quantity;
+            return PHP_INT_MAX;
         }
 
         return $product->stock_quantity;
@@ -74,24 +79,11 @@ class AddOrderItemAction
 
     private function decrementStock(Product $product, ?ProductVariant $variant, int $quantity): void
     {
+        // Stock decrement is handled by DeductInventoryAction via ingredients
         if ($variant) {
-            $variant->decrement('stock_quantity', $quantity);
-        } else {
-            $product->decrement('stock_quantity', $quantity);
+            return;
         }
-    }
 
-    private function recalculateOrder(Order $order): void
-    {
-        $subtotal = $order->items->sum('total_price');
-        $taxRate = config('pos.tax_rate', 0.10);
-        $tax = round($subtotal * $taxRate, 2);
-        $total = $subtotal + $tax - $order->discount;
-
-        $order->update([
-            'subtotal' => $subtotal,
-            'tax' => $tax,
-            'total' => max(0, $total),
-        ]);
+        $product->decrement('stock_quantity', $quantity);
     }
 }

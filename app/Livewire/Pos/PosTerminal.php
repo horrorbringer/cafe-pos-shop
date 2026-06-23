@@ -9,6 +9,7 @@ use App\Domain\Ordering\Actions\CancelOrderAction;
 use App\Domain\Ordering\Actions\CompleteOrderAction;
 use App\Domain\Ordering\Actions\CreateOrderAction;
 use App\Domain\Ordering\Actions\ProcessPaymentAction;
+use App\Domain\Ordering\Actions\RecalculateOrderTotalsAction;
 use App\Domain\Ordering\Actions\RemoveOrderItemAction;
 use App\Domain\Ordering\Models\Order;
 use App\Domain\Payment\PaymentManager;
@@ -62,20 +63,26 @@ class PosTerminal extends Component
 
     public bool $showSuspendedOrders = false;
 
+    public bool $processing = false;
+
     protected ReceiptPrinterService $receiptService;
 
     protected PaymentManager $paymentManager;
 
     protected ProcessPaymentAction $processPaymentAction;
 
+    protected RecalculateOrderTotalsAction $recalculateOrder;
+
     public function boot(
         ReceiptPrinterService $receiptService,
         PaymentManager $paymentManager,
-        ProcessPaymentAction $processPaymentAction
+        ProcessPaymentAction $processPaymentAction,
+        RecalculateOrderTotalsAction $recalculateOrder,
     ): void {
         $this->receiptService = $receiptService;
         $this->paymentManager = $paymentManager;
         $this->processPaymentAction = $processPaymentAction;
+        $this->recalculateOrder = $recalculateOrder;
     }
 
     public function mount(): void
@@ -85,7 +92,7 @@ class PosTerminal extends Component
 
     public function startNewOrder(): void
     {
-        $this->order = (new CreateOrderAction)->execute(
+        $this->order = app(CreateOrderAction::class)->execute(
             Auth::user(),
             null,
             $this->orderType,
@@ -187,7 +194,7 @@ class PosTerminal extends Component
     #[Computed]
     public function itemCount(): int
     {
-        return $this->order?->items->sum('quantity') ?? 0;
+        return $this->order?->items()->sum('quantity') ?? 0;
     }
 
     #[Computed]
@@ -226,7 +233,7 @@ class PosTerminal extends Component
         $order = Order::findOrFail($orderId);
 
         if ($this->order && $this->itemCount > 0) {
-            (new CancelOrderAction)->execute($this->order, Auth::user(), 'Cancelled to resume held order');
+            app(CancelOrderAction::class)->execute($this->order, Auth::user(), 'Cancelled to resume held order');
         }
 
         $this->order = $order;
@@ -256,21 +263,51 @@ class PosTerminal extends Component
         $this->showModifierModal = true;
     }
 
-    public function toggleModifier(int $modifierGroupId, int $modifierOptionId, string $groupName, string $optionName, float $price, int $maxSelections, bool $isRequired): void
+    public function selectVariant(int $variantId): void
     {
+        if (! $this->selectedProduct) {
+            return;
+        }
+
+        $variants = collect($this->selectedProduct['variants'] ?? []);
+        $this->selectedVariant = $variants->firstWhere('id', $variantId);
+    }
+
+    public function toggleModifier(int $modifierOptionId): void
+    {
+        if (! $this->selectedProduct) {
+            return;
+        }
+
+        $option = null;
+        $group = null;
+        foreach ($this->selectedProduct['modifier_groups'] ?? [] as $g) {
+            foreach ($g['options'] ?? [] as $o) {
+                if ($o['id'] === $modifierOptionId) {
+                    $option = $o;
+                    $group = $g;
+                    break 2;
+                }
+            }
+        }
+
+        if (! $option || ! $group) {
+            return;
+        }
+
         $existingIndex = array_search($modifierOptionId, array_column($this->selectedModifiers, 'modifier_option_id'));
 
         if ($existingIndex !== false) {
             unset($this->selectedModifiers[$existingIndex]);
             $this->selectedModifiers = array_values($this->selectedModifiers);
         } else {
-            $groupModifiers = array_filter($this->selectedModifiers, fn ($m) => $m['modifier_group_name'] === $groupName);
+            $groupModifiers = array_filter(
+                $this->selectedModifiers,
+                fn ($m) => $m['modifier_group_name'] === $group['name']
+            );
 
-            if (count($groupModifiers) >= $maxSelections) {
-                $oldestKey = array_key_first(array_filter(
-                    $this->selectedModifiers,
-                    fn ($m) => $m['modifier_group_name'] === $groupName
-                ));
+            if (count($groupModifiers) >= $group['max_selections']) {
+                $oldestKey = array_key_first($groupModifiers);
                 if ($oldestKey !== null) {
                     unset($this->selectedModifiers[$oldestKey]);
                     $this->selectedModifiers = array_values($this->selectedModifiers);
@@ -279,9 +316,9 @@ class PosTerminal extends Component
 
             $this->selectedModifiers[] = [
                 'modifier_option_id' => $modifierOptionId,
-                'modifier_group_name' => $groupName,
-                'modifier_option_name' => $optionName,
-                'price' => $price,
+                'modifier_group_name' => $group['name'],
+                'modifier_option_name' => $option['name'],
+                'price' => $option['price'],
             ];
         }
     }
@@ -299,7 +336,7 @@ class PosTerminal extends Component
             $variant = $product->variants()->find($this->selectedVariant['id']);
         }
 
-        (new AddOrderItemAction)->execute(
+        app(AddOrderItemAction::class)->execute(
             order: $this->order,
             product: $product,
             quantity: $this->itemQuantity,
@@ -329,7 +366,7 @@ class PosTerminal extends Component
             return;
         }
 
-        (new AddOrderItemAction)->execute($this->order, $product);
+        app(AddOrderItemAction::class)->execute($this->order, $product);
 
         $this->order = $this->order->fresh();
     }
@@ -338,7 +375,7 @@ class PosTerminal extends Component
     {
         $item = $this->order->items()->findOrFail($itemId);
 
-        (new RemoveOrderItemAction)->execute($this->order, $item);
+        app(RemoveOrderItemAction::class)->execute($this->order, $item);
 
         $this->order = $this->order->fresh();
     }
@@ -357,33 +394,15 @@ class PosTerminal extends Component
             'total_price' => $quantity * $item->unit_price,
         ]);
 
-        $subtotal = $this->order->items->sum('total_price');
-        $taxRate = config('pos.tax_rate', 0.10);
-        $tax = round($subtotal * $taxRate, 2);
-
-        $this->order->update([
-            'subtotal' => $subtotal,
-            'tax' => $tax,
-            'total' => $subtotal + $tax - $this->order->discount,
-        ]);
-
         $this->order = $this->order->fresh();
+        $this->recalculateOrder->execute($this->order);
     }
 
     public function applyDiscount(float $discount): void
     {
         $this->order->update(['discount' => $discount]);
-
-        $subtotal = $this->order->items->sum('total_price');
-        $taxRate = config('pos.tax_rate', 0.10);
-        $tax = round($subtotal * $taxRate, 2);
-
-        $this->order->update([
-            'tax' => $tax,
-            'total' => $subtotal + $tax - $discount,
-        ]);
-
         $this->order = $this->order->fresh();
+        $this->recalculateOrder->execute($this->order);
     }
 
     public function applyDiscountPercent(int $percent): void
@@ -392,6 +411,15 @@ class PosTerminal extends Component
         $discount = round($subtotal * ($percent / 100), 2);
 
         $this->applyDiscount($discount);
+    }
+
+    public function isActiveDiscountPercent(int $percent): bool
+    {
+        if (! $this->order || $this->order->discount <= 0 || $this->subtotal <= 0) {
+            return false;
+        }
+
+        return round(($this->order->discount / $this->subtotal) * 100) === $percent;
     }
 
     public function updatedOrderNotes(string $value): void
@@ -427,7 +455,12 @@ class PosTerminal extends Component
             return;
         }
 
+        $this->processing = true;
+
         $qrData = $this->processPaymentAction->createKhqrPayment($this->order, Auth::user());
+
+        // Refresh order so in-memory status reflects DB transition (Draft → Pending)
+        $this->order = $this->order->fresh();
 
         if ($qrData) {
             $this->khqrData = $qrData;
@@ -438,6 +471,8 @@ class PosTerminal extends Component
         } else {
             $this->dispatch('show-toast', message: 'Failed to generate KHQR code', type: 'error');
         }
+
+        $this->processing = false;
     }
 
     public function checkKhqrStatus(): void
@@ -445,6 +480,8 @@ class PosTerminal extends Component
         if (! $this->khqrData || ! $this->order) {
             return;
         }
+
+        $this->processing = true;
 
         try {
             $status = $this->paymentManager->checkStatus(
@@ -460,7 +497,7 @@ class PosTerminal extends Component
                     user: Auth::user()
                 );
 
-                $order = (new CompleteOrderAction)->execute($order, Auth::user());
+                $order = app(CompleteOrderAction::class)->execute($order, Auth::user());
 
                 $this->receiptContent = $this->receiptService->generateReceiptContent($order);
                 $this->showKhqrModal = false;
@@ -469,8 +506,11 @@ class PosTerminal extends Component
 
                 $this->dispatch('show-toast', message: 'Payment confirmed!', type: 'success');
             }
+
+            $this->processing = false;
         } catch (\Exception $e) {
             $this->dispatch('show-toast', message: 'Error checking payment status', type: 'error');
+            $this->processing = false;
         }
     }
 
@@ -483,6 +523,8 @@ class PosTerminal extends Component
                 return;
             }
 
+            $this->processing = true;
+
             $order = $this->processPaymentAction->execute(
                 order: $this->order,
                 amountPaid: $this->amountTendered,
@@ -490,12 +532,18 @@ class PosTerminal extends Component
                 user: Auth::user()
             );
 
-            $order = (new CompleteOrderAction)->execute($order, Auth::user());
+            $order = app(CompleteOrderAction::class)->execute($order, Auth::user());
 
             $this->receiptContent = $this->receiptService->generateReceiptContent($order);
             $this->showPaymentModal = false;
             $this->showReceiptModal = true;
+
+            $this->processing = false;
+
+            return;
         }
+
+        $this->dispatch('show-toast', message: __('This payment method is not available'), type: 'error');
     }
 
     public function cancelKhqr(): void
@@ -526,7 +574,7 @@ class PosTerminal extends Component
     public function cancelOrder(): void
     {
         if ($this->order && $this->itemCount > 0) {
-            (new CancelOrderAction)->execute($this->order, Auth::user(), 'Cancelled from POS');
+            app(CancelOrderAction::class)->execute($this->order, Auth::user(), 'Cancelled from POS');
         }
 
         $this->startNewOrder();
