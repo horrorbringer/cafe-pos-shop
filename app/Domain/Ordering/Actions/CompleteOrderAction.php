@@ -1,0 +1,36 @@
+<?php
+
+namespace App\Domain\Ordering\Actions;
+
+use App\Domain\Notifications\Events\OrderPaid;
+use App\Domain\Ordering\Models\Order;
+use App\Domain\Shared\Enums\OrderStatus;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+
+class CompleteOrderAction
+{
+    public function __construct(
+        protected TransitionOrderStatusAction $transitionStatus,
+    ) {}
+
+    public function execute(Order $order, User $user): Order
+    {
+        return DB::transaction(function () use ($order, $user) {
+            $order = $this->transitionStatus->execute(
+                $order,
+                OrderStatus::Completed,
+                $user->id,
+                'Order completed',
+            );
+
+            event(new OrderPaid(
+                order: $order,
+                amountPaid: $order->amount_paid,
+                paymentMethod: $order->payments()->latest()->first()?->method ?? 'unknown',
+            ));
+
+            return $order;
+        });
+    }
+}
