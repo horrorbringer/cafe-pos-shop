@@ -28,9 +28,11 @@ return [
     'providers' => [
 
         'bakong' => [
-            'base_url' => env('BAKONG_API_URL', 'https://api.bakong.gov.kh'),
+            'base_url' => env('BAKONG_API_URL', 'https://api-bakong.nbc.gov.kh'),
             'access_token' => env('BAKONG_ACCESS_TOKEN', ''),
             'merchant_id' => env('BAKONG_MERCHANT_ID', ''),
+            'acquiring_bank' => env('BAKONG_ACQUIRING_BANK', 'NBC'),
+            'mobile_number' => env('BAKONG_MOBILE_NUMBER', ''),
         ],
 
         'third_party_khqr' => [

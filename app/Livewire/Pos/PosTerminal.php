@@ -500,6 +500,7 @@ class PosTerminal extends Component
                 $order = app(CompleteOrderAction::class)->execute($order, Auth::user());
 
                 $this->receiptContent = $this->receiptService->generateReceiptContent($order);
+                $this->khqrData = null;
                 $this->showKhqrModal = false;
                 $this->showPaymentModal = false;
                 $this->showReceiptModal = true;

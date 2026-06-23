@@ -677,7 +677,7 @@
         @endphp
         <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4"
             x-data="{ pollInterval: null, timerInterval: null }"
-            x-init="clearInterval(pollInterval); pollInterval = setInterval(() => { $wire.checkKhqrStatus(); }, 3000); $wire.checkKhqrStatus()"
+            x-init="clearInterval(pollInterval); pollInterval = setInterval(() => { $wire.checkKhqrStatus(); }, 3000)"
             x-on:keydown.escape.window="clearInterval(pollInterval); clearInterval(timerInterval)"
             x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0"
