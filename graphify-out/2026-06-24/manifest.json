@@ -1,0 +1,492 @@
+{
+  "/Users/vanny/Herd/small-cafe-pos/.mcp.json": {
+    "mtime": 1782116224.1579087,
+    "ast_hash": "ee8f920cd448a8a5036dda43d44c1d64",
+    "semantic_hash": "ee8f920cd448a8a5036dda43d44c1d64"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/app/Http/Controllers/Controller.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "25a307335c0719bc9a91b3f7babd186d",
+    "semantic_hash": "25a307335c0719bc9a91b3f7babd186d"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/app/Models/User.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "ca00ef9e587df52eeb3f687855f5c234",
+    "semantic_hash": "ca00ef9e587df52eeb3f687855f5c234"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/app/Providers/AppServiceProvider.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "c0094f35cad6bba7636002a62186dae4",
+    "semantic_hash": "c0094f35cad6bba7636002a62186dae4"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/artisan": {
+    "mtime": 1779750712.0,
+    "ast_hash": "e66bb13691f6184c762c196427d8e685",
+    "semantic_hash": "e66bb13691f6184c762c196427d8e685"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/boost.json": {
+    "mtime": 1782116224.1623938,
+    "ast_hash": "5dc8622e40d3f241b07c55b1bdf47ef8",
+    "semantic_hash": "5dc8622e40d3f241b07c55b1bdf47ef8"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/bootstrap/app.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "1af409508a89bf168e42816535a9503b",
+    "semantic_hash": "1af409508a89bf168e42816535a9503b"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/bootstrap/cache/packages.php": {
+    "mtime": 1782116173.1365194,
+    "ast_hash": "91110068d01e8dfa9661a986cf159d6a",
+    "semantic_hash": "91110068d01e8dfa9661a986cf159d6a"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/bootstrap/cache/services.php": {
+    "mtime": 1782116173.0316703,
+    "ast_hash": "134cc9f3ce0a2b1382922e35576a505c",
+    "semantic_hash": "134cc9f3ce0a2b1382922e35576a505c"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/bootstrap/providers.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "888c810b5a4720916f07aa05dd2c2dd3",
+    "semantic_hash": "888c810b5a4720916f07aa05dd2c2dd3"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/composer.json": {
+    "mtime": 1782116173.9724236,
+    "ast_hash": "d47d8c066ceceba54065980b3f0dba3c",
+    "semantic_hash": "d47d8c066ceceba54065980b3f0dba3c"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/config/app.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "276578ad68424be59d0998379ae7d4cb",
+    "semantic_hash": "276578ad68424be59d0998379ae7d4cb"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/config/auth.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "26354511ab860b301f2a3554bc388b91",
+    "semantic_hash": "26354511ab860b301f2a3554bc388b91"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/config/cache.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "399c7a3b4bca7e3cb9b622828682ab56",
+    "semantic_hash": "399c7a3b4bca7e3cb9b622828682ab56"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/config/database.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "594a01554ab7583541a8fb05a69f935f",
+    "semantic_hash": "594a01554ab7583541a8fb05a69f935f"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/config/filesystems.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "bde1aa1027f0448f17348dbd93f3d7ea",
+    "semantic_hash": "bde1aa1027f0448f17348dbd93f3d7ea"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/config/logging.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "d8255a5c07d3da72c7c9363f0c44bddd",
+    "semantic_hash": "d8255a5c07d3da72c7c9363f0c44bddd"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/config/mail.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "18601a927b48d38337ba2077426a7d60",
+    "semantic_hash": "18601a927b48d38337ba2077426a7d60"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/config/queue.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "f98ce92e7bf51db1fabaf8a30e12fc5a",
+    "semantic_hash": "f98ce92e7bf51db1fabaf8a30e12fc5a"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/config/services.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "534a1b7af7009c373ea4ebfa18823d57",
+    "semantic_hash": "534a1b7af7009c373ea4ebfa18823d57"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/config/session.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "5ea7169252ec3cc7fad471f5cd0d7678",
+    "semantic_hash": "5ea7169252ec3cc7fad471f5cd0d7678"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/database/factories/UserFactory.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "1c9f381f9c2bc3027971a3bfdbe99164",
+    "semantic_hash": "1c9f381f9c2bc3027971a3bfdbe99164"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/database/migrations/0001_01_01_000000_create_users_table.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "138280095e9d19f2ba6fb830415602e2",
+    "semantic_hash": "138280095e9d19f2ba6fb830415602e2"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/database/migrations/0001_01_01_000001_create_cache_table.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "6952fb360e8d8b84e6f47573e4459d48",
+    "semantic_hash": "6952fb360e8d8b84e6f47573e4459d48"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/database/migrations/0001_01_01_000002_create_jobs_table.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "b0603b9fa0a27473971da76bb0c42ee1",
+    "semantic_hash": "b0603b9fa0a27473971da76bb0c42ee1"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/database/seeders/DatabaseSeeder.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "ab1e985d74209458e33e0f4eb89fb77e",
+    "semantic_hash": "ab1e985d74209458e33e0f4eb89fb77e"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/opencode.json": {
+    "mtime": 1782116224.1594622,
+    "ast_hash": "1f42217599a3431dafead845b48e216f",
+    "semantic_hash": "1f42217599a3431dafead845b48e216f"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/package.json": {
+    "mtime": 1779750712.0,
+    "ast_hash": "0cdafb1ed5ed16e0ad8d871d33e3eafc",
+    "semantic_hash": "0cdafb1ed5ed16e0ad8d871d33e3eafc"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/public/index.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "d8eda274115af5fd2aaa8230af329ef7",
+    "semantic_hash": "d8eda274115af5fd2aaa8230af329ef7"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/resources/js/app.js": {
+    "mtime": 1779750712.0,
+    "ast_hash": "b519d08ef66fd54910edbedba6181ec2",
+    "semantic_hash": "b519d08ef66fd54910edbedba6181ec2"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/resources/views/welcome.blade.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "1a03818ea91deb4f3989c6c994e5867c",
+    "semantic_hash": "1a03818ea91deb4f3989c6c994e5867c"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/routes/console.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "3c6ce2e6d16444282b24a9aa63885563",
+    "semantic_hash": "3c6ce2e6d16444282b24a9aa63885563"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/routes/web.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "84625c52e743b1a4178bb27b7afb3615",
+    "semantic_hash": "84625c52e743b1a4178bb27b7afb3615"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/storage/framework/views/138fdffdfefe5976ba64854846d0dc52.php": {
+    "mtime": 1782116222.5681422,
+    "ast_hash": "8dd9a8b36fff52b5559bc571764f86c0",
+    "semantic_hash": "8dd9a8b36fff52b5559bc571764f86c0"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/storage/framework/views/2b3b75ec9892892981b355f1d066492b.blade.php": {
+    "mtime": 1782116222.5674546,
+    "ast_hash": "b503380939a2d97d03c07559db888732",
+    "semantic_hash": "b503380939a2d97d03c07559db888732"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/storage/framework/views/2d21c7721a51fb6d42304f35ce55c99a.blade.php": {
+    "mtime": 1782116222.5634532,
+    "ast_hash": "1c92c8ad0e92b6a0d4dbc4f1e137f7a9",
+    "semantic_hash": "1c92c8ad0e92b6a0d4dbc4f1e137f7a9"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/storage/framework/views/56412a9aeb6f1e81a1c3ce244096a4cf.blade.php": {
+    "mtime": 1782116222.5545797,
+    "ast_hash": "7e6fc0d97ac54e563cfc029d9d5a74a1",
+    "semantic_hash": "7e6fc0d97ac54e563cfc029d9d5a74a1"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/storage/framework/views/83447e8b560529346241af1fce1b7e5e.php": {
+    "mtime": 1782116222.5623174,
+    "ast_hash": "f00a572882163d7b515854ea0eebbf15",
+    "semantic_hash": "f00a572882163d7b515854ea0eebbf15"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/storage/framework/views/8ce22e70666ef11262c5839c797109ca.php": {
+    "mtime": 1782116222.557865,
+    "ast_hash": "7c8290cc43caaef48077ac6552f191d5",
+    "semantic_hash": "7c8290cc43caaef48077ac6552f191d5"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/storage/framework/views/ad027bc1f4f77db585097342990de57b.blade.php": {
+    "mtime": 1782116222.5693302,
+    "ast_hash": "bfe58249aad84cca296102ab021d6596",
+    "semantic_hash": "bfe58249aad84cca296102ab021d6596"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/storage/framework/views/d1640c796ea7d658f5d537a146d3b49c.blade.php": {
+    "mtime": 1782116222.5653372,
+    "ast_hash": "d5422d1ebdc8cc9c95b035dfc3f74301",
+    "semantic_hash": "d5422d1ebdc8cc9c95b035dfc3f74301"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/storage/framework/views/deae90e5907984ae94dcef4100fbae8d.php": {
+    "mtime": 1782116222.5640857,
+    "ast_hash": "a436ba77a88fb1ba707dd57ae8c60966",
+    "semantic_hash": "a436ba77a88fb1ba707dd57ae8c60966"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/storage/framework/views/e3b9888097c7ff3c001c6cdebb490dc0.blade.php": {
+    "mtime": 1782116222.5592408,
+    "ast_hash": "e188ada50e3502c7003cf861c736232a",
+    "semantic_hash": "e188ada50e3502c7003cf861c736232a"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/storage/framework/views/e51fb725e787b3673a4170224f4148da.php": {
+    "mtime": 1782116222.5700088,
+    "ast_hash": "15d11e99edad98b2cb2edd72f4d72d12",
+    "semantic_hash": "15d11e99edad98b2cb2edd72f4d72d12"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/storage/framework/views/ed6a402352563ec129202a8c9123bd23.php": {
+    "mtime": 1782116222.5660515,
+    "ast_hash": "e34d698d1d4037c713893cb0a52f592f",
+    "semantic_hash": "e34d698d1d4037c713893cb0a52f592f"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/storage/framework/views/efe75c7c0953490022ba5bd3c31dea8d.blade.php": {
+    "mtime": 1782116222.5616727,
+    "ast_hash": "a6faec9fbfbc5bb572947b5686788c9f",
+    "semantic_hash": "a6faec9fbfbc5bb572947b5686788c9f"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/storage/framework/views/f1948dfd3732624606d7808d5ae4b24c.php": {
+    "mtime": 1782116222.5601647,
+    "ast_hash": "5e41430322098ab4c593347c8c060801",
+    "semantic_hash": "5e41430322098ab4c593347c8c060801"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/tests/Feature/ExampleTest.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "0f4d91c9c5bbcd4e2f46cf885acb7fb6",
+    "semantic_hash": "0f4d91c9c5bbcd4e2f46cf885acb7fb6"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/tests/TestCase.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "7e567dc27e68d5b57bae16af07f68907",
+    "semantic_hash": "7e567dc27e68d5b57bae16af07f68907"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/tests/Unit/ExampleTest.php": {
+    "mtime": 1779750712.0,
+    "ast_hash": "3f679e9508c834f0ad95943455fcd836",
+    "semantic_hash": "3f679e9508c834f0ad95943455fcd836"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/vite.config.js": {
+    "mtime": 1779750712.0,
+    "ast_hash": "8ef22d264079dab94f6d36526b0cb1bc",
+    "semantic_hash": "8ef22d264079dab94f6d36526b0cb1bc"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.agents/skills/laravel-best-practices/SKILL.md": {
+    "mtime": 1782116223.3925653,
+    "ast_hash": "9c7086e9a09ad20fa66bb9a462d06fa2",
+    "semantic_hash": "9c7086e9a09ad20fa66bb9a462d06fa2"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.agents/skills/laravel-best-practices/rules/advanced-queries.md": {
+    "mtime": 1782116223.4018652,
+    "ast_hash": "9a78d2f8810d0c5a2b8b72df91ca4a18",
+    "semantic_hash": "9a78d2f8810d0c5a2b8b72df91ca4a18"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.agents/skills/laravel-best-practices/rules/architecture.md": {
+    "mtime": 1782116223.3947666,
+    "ast_hash": "78bf0e41b3aba8f2531c4dcbb6b9b64f",
+    "semantic_hash": "78bf0e41b3aba8f2531c4dcbb6b9b64f"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.agents/skills/laravel-best-practices/rules/blade-views.md": {
+    "mtime": 1782116223.3978262,
+    "ast_hash": "3c259ceaa9074c0e503c01c2d5d5de58",
+    "semantic_hash": "3c259ceaa9074c0e503c01c2d5d5de58"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.agents/skills/laravel-best-practices/rules/caching.md": {
+    "mtime": 1782116223.396067,
+    "ast_hash": "50bec263dad9c1611c697480671cdea7",
+    "semantic_hash": "50bec263dad9c1611c697480671cdea7"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.agents/skills/laravel-best-practices/rules/collections.md": {
+    "mtime": 1782116223.3956015,
+    "ast_hash": "a377a223899308ace42da6b71775b8d7",
+    "semantic_hash": "a377a223899308ace42da6b71775b8d7"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.agents/skills/laravel-best-practices/rules/config.md": {
+    "mtime": 1782116223.3993564,
+    "ast_hash": "3cf9e90d78c23ba56cc7158160868104",
+    "semantic_hash": "3cf9e90d78c23ba56cc7158160868104"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.agents/skills/laravel-best-practices/rules/db-performance.md": {
+    "mtime": 1782116223.3952303,
+    "ast_hash": "30ca712aa13bb1acd2466d42eed36561",
+    "semantic_hash": "30ca712aa13bb1acd2466d42eed36561"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.agents/skills/laravel-best-practices/rules/eloquent.md": {
+    "mtime": 1782116223.396643,
+    "ast_hash": "a12c2654d643934a4aeecad00d888e17",
+    "semantic_hash": "a12c2654d643934a4aeecad00d888e17"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.agents/skills/laravel-best-practices/rules/error-handling.md": {
+    "mtime": 1782116223.4010627,
+    "ast_hash": "75ea9b08d01ff1159c7fc8e7da9b70b9",
+    "semantic_hash": "75ea9b08d01ff1159c7fc8e7da9b70b9"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.agents/skills/laravel-best-practices/rules/events-notifications.md": {
+    "mtime": 1782116223.4014668,
+    "ast_hash": "696011b9584ae0df0ca483e55ecd86c9",
+    "semantic_hash": "696011b9584ae0df0ca483e55ecd86c9"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.agents/skills/laravel-best-practices/rules/http-client.md": {
+    "mtime": 1782116223.400681,
+    "ast_hash": "fef2e702533bc8049f57bd6991296174",
+    "semantic_hash": "fef2e702533bc8049f57bd6991296174"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.agents/skills/laravel-best-practices/rules/mail.md": {
+    "mtime": 1782116223.4002411,
+    "ast_hash": "895f4d0643171b04f7b399027cb00d6c",
+    "semantic_hash": "895f4d0643171b04f7b399027cb00d6c"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.agents/skills/laravel-best-practices/rules/migrations.md": {
+    "mtime": 1782116223.3942444,
+    "ast_hash": "c46b22f0a58df02235cada95208b3d8a",
+    "semantic_hash": "c46b22f0a58df02235cada95208b3d8a"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.agents/skills/laravel-best-practices/rules/queue-jobs.md": {
+    "mtime": 1782116223.3985295,
+    "ast_hash": "556b119d5ae10462c69908a8399025c0",
+    "semantic_hash": "556b119d5ae10462c69908a8399025c0"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.agents/skills/laravel-best-practices/rules/routing.md": {
+    "mtime": 1782116223.393261,
+    "ast_hash": "6a10a65bd0b071eb2428ed6dd31ccf75",
+    "semantic_hash": "6a10a65bd0b071eb2428ed6dd31ccf75"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.agents/skills/laravel-best-practices/rules/scheduling.md": {
+    "mtime": 1782116223.3937638,
+    "ast_hash": "ec51edae2effafe9633103a68ba023e6",
+    "semantic_hash": "ec51edae2effafe9633103a68ba023e6"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.agents/skills/laravel-best-practices/rules/security.md": {
+    "mtime": 1782116223.4022756,
+    "ast_hash": "66364ca65dbc9e2c782aaee470d9f280",
+    "semantic_hash": "66364ca65dbc9e2c782aaee470d9f280"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.agents/skills/laravel-best-practices/rules/style.md": {
+    "mtime": 1782116223.3998244,
+    "ast_hash": "1b2594b86f4beb3129cff47a9a45b9ba",
+    "semantic_hash": "1b2594b86f4beb3129cff47a9a45b9ba"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.agents/skills/laravel-best-practices/rules/testing.md": {
+    "mtime": 1782116223.3989534,
+    "ast_hash": "c31ca40674ed518d8570b089f3eabec4",
+    "semantic_hash": "c31ca40674ed518d8570b089f3eabec4"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.agents/skills/laravel-best-practices/rules/validation.md": {
+    "mtime": 1782116223.3972344,
+    "ast_hash": "901e4430821794a642694d445f43e43a",
+    "semantic_hash": "901e4430821794a642694d445f43e43a"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.claude/skills/laravel-best-practices/SKILL.md": {
+    "mtime": 1782116223.3424373,
+    "ast_hash": "9c7086e9a09ad20fa66bb9a462d06fa2",
+    "semantic_hash": "9c7086e9a09ad20fa66bb9a462d06fa2"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.claude/skills/laravel-best-practices/rules/advanced-queries.md": {
+    "mtime": 1782116223.3510695,
+    "ast_hash": "9a78d2f8810d0c5a2b8b72df91ca4a18",
+    "semantic_hash": "9a78d2f8810d0c5a2b8b72df91ca4a18"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.claude/skills/laravel-best-practices/rules/architecture.md": {
+    "mtime": 1782116223.3443923,
+    "ast_hash": "78bf0e41b3aba8f2531c4dcbb6b9b64f",
+    "semantic_hash": "78bf0e41b3aba8f2531c4dcbb6b9b64f"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.claude/skills/laravel-best-practices/rules/blade-views.md": {
+    "mtime": 1782116223.3471353,
+    "ast_hash": "3c259ceaa9074c0e503c01c2d5d5de58",
+    "semantic_hash": "3c259ceaa9074c0e503c01c2d5d5de58"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.claude/skills/laravel-best-practices/rules/caching.md": {
+    "mtime": 1782116223.3460019,
+    "ast_hash": "50bec263dad9c1611c697480671cdea7",
+    "semantic_hash": "50bec263dad9c1611c697480671cdea7"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.claude/skills/laravel-best-practices/rules/collections.md": {
+    "mtime": 1782116223.3455935,
+    "ast_hash": "a377a223899308ace42da6b71775b8d7",
+    "semantic_hash": "a377a223899308ace42da6b71775b8d7"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.claude/skills/laravel-best-practices/rules/config.md": {
+    "mtime": 1782116223.3485417,
+    "ast_hash": "3cf9e90d78c23ba56cc7158160868104",
+    "semantic_hash": "3cf9e90d78c23ba56cc7158160868104"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.claude/skills/laravel-best-practices/rules/db-performance.md": {
+    "mtime": 1782116223.3451583,
+    "ast_hash": "30ca712aa13bb1acd2466d42eed36561",
+    "semantic_hash": "30ca712aa13bb1acd2466d42eed36561"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.claude/skills/laravel-best-practices/rules/eloquent.md": {
+    "mtime": 1782116223.3463845,
+    "ast_hash": "a12c2654d643934a4aeecad00d888e17",
+    "semantic_hash": "a12c2654d643934a4aeecad00d888e17"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.claude/skills/laravel-best-practices/rules/error-handling.md": {
+    "mtime": 1782116223.3502023,
+    "ast_hash": "75ea9b08d01ff1159c7fc8e7da9b70b9",
+    "semantic_hash": "75ea9b08d01ff1159c7fc8e7da9b70b9"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.claude/skills/laravel-best-practices/rules/events-notifications.md": {
+    "mtime": 1782116223.3506548,
+    "ast_hash": "696011b9584ae0df0ca483e55ecd86c9",
+    "semantic_hash": "696011b9584ae0df0ca483e55ecd86c9"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.claude/skills/laravel-best-practices/rules/http-client.md": {
+    "mtime": 1782116223.3498194,
+    "ast_hash": "fef2e702533bc8049f57bd6991296174",
+    "semantic_hash": "fef2e702533bc8049f57bd6991296174"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.claude/skills/laravel-best-practices/rules/mail.md": {
+    "mtime": 1782116223.3493931,
+    "ast_hash": "895f4d0643171b04f7b399027cb00d6c",
+    "semantic_hash": "895f4d0643171b04f7b399027cb00d6c"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.claude/skills/laravel-best-practices/rules/migrations.md": {
+    "mtime": 1782116223.3437223,
+    "ast_hash": "c46b22f0a58df02235cada95208b3d8a",
+    "semantic_hash": "c46b22f0a58df02235cada95208b3d8a"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.claude/skills/laravel-best-practices/rules/queue-jobs.md": {
+    "mtime": 1782116223.3477032,
+    "ast_hash": "556b119d5ae10462c69908a8399025c0",
+    "semantic_hash": "556b119d5ae10462c69908a8399025c0"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.claude/skills/laravel-best-practices/rules/routing.md": {
+    "mtime": 1782116223.3429477,
+    "ast_hash": "6a10a65bd0b071eb2428ed6dd31ccf75",
+    "semantic_hash": "6a10a65bd0b071eb2428ed6dd31ccf75"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.claude/skills/laravel-best-practices/rules/scheduling.md": {
+    "mtime": 1782116223.3432832,
+    "ast_hash": "ec51edae2effafe9633103a68ba023e6",
+    "semantic_hash": "ec51edae2effafe9633103a68ba023e6"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.claude/skills/laravel-best-practices/rules/security.md": {
+    "mtime": 1782116223.351554,
+    "ast_hash": "66364ca65dbc9e2c782aaee470d9f280",
+    "semantic_hash": "66364ca65dbc9e2c782aaee470d9f280"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.claude/skills/laravel-best-practices/rules/style.md": {
+    "mtime": 1782116223.3489387,
+    "ast_hash": "1b2594b86f4beb3129cff47a9a45b9ba",
+    "semantic_hash": "1b2594b86f4beb3129cff47a9a45b9ba"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.claude/skills/laravel-best-practices/rules/testing.md": {
+    "mtime": 1782116223.3481672,
+    "ast_hash": "c31ca40674ed518d8570b089f3eabec4",
+    "semantic_hash": "c31ca40674ed518d8570b089f3eabec4"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/.claude/skills/laravel-best-practices/rules/validation.md": {
+    "mtime": 1782116223.3467538,
+    "ast_hash": "901e4430821794a642694d445f43e43a",
+    "semantic_hash": "901e4430821794a642694d445f43e43a"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/AGENTS.md": {
+    "mtime": 1782116223.3307302,
+    "ast_hash": "514d9ca2586522ed8750ae6cf084d532",
+    "semantic_hash": "514d9ca2586522ed8750ae6cf084d532"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/CLAUDE.md": {
+    "mtime": 1782116223.328059,
+    "ast_hash": "514d9ca2586522ed8750ae6cf084d532",
+    "semantic_hash": "514d9ca2586522ed8750ae6cf084d532"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/README.md": {
+    "mtime": 1779750712.0,
+    "ast_hash": "d2661a31fed7f254f5b7d3b6fe19330a",
+    "semantic_hash": "d2661a31fed7f254f5b7d3b6fe19330a"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/plan.md": {
+    "mtime": 1782116349.1945245,
+    "ast_hash": "00560d78b6666ada941c25707fb2a2ad",
+    "semantic_hash": "00560d78b6666ada941c25707fb2a2ad"
+  },
+  "/Users/vanny/Herd/small-cafe-pos/public/robots.txt": {
+    "mtime": 1779750712.0,
+    "ast_hash": "b6216d61c03e6ce0c9aea6ca7808f7ca",
+    "semantic_hash": "b6216d61c03e6ce0c9aea6ca7808f7ca"
+  }
+}
