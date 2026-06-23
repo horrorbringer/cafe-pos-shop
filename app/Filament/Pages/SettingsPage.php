@@ -169,6 +169,7 @@ class SettingsPage extends Page
                                         FileUpload::make('shopLogo')
                                             ->label('Logo')
                                             ->image()
+                                            ->disk('public')
                                             ->directory('logos')
                                             ->maxSize(2048)
                                             ->columnSpanFull(),
@@ -481,7 +482,7 @@ class SettingsPage extends Page
             'orderType' => 'Dine-in',
             'orderTable' => '5',
             'cashierName' => 'Admin',
-            'logoUrl' => ! empty($this->shopLogo[0]) ? Storage::url($this->shopLogo[0]) : null,
+            'logoUrl' => ! empty($this->shopLogo[0]) && Storage::disk('public')->exists($this->shopLogo[0]) ? Storage::url($this->shopLogo[0]) : null,
             'header' => $this->receiptHeader ?? '',
             'footer' => $this->receiptFooter ?? '',
             'showAddress' => $this->receiptShowAddress ?? true,
@@ -521,31 +522,35 @@ class SettingsPage extends Page
 
     public function save(): void
     {
-        Setting::setValue('shop_name', $this->shopName, 'string');
-        Setting::setValue('shop_address', $this->shopAddress, 'string');
-        Setting::setValue('shop_phone', $this->shopPhone, 'string');
-        Setting::setValue('shop_logo', $this->shopLogo[0] ?? '', 'string');
-        Setting::setValue('shop_currency', $this->shopCurrency, 'string');
-        Setting::setValue('shop_tax_rate', (string) $this->shopTaxRate, 'float');
+        $state = $this->content->getState();
 
-        Setting::setValue('payments_cash_enabled', $this->paymentsCashEnabled ? '1' : '0', 'boolean');
-        Setting::setValue('payments_khqr_enabled', $this->paymentsKhqrEnabled ? '1' : '0', 'boolean');
-        Setting::setValue('payments_provider', $this->paymentsProvider, 'string');
+        $state['shopLogo'] = $this->shopLogo;
 
-        Setting::setValue('receipt_header', $this->receiptHeader, 'string');
-        Setting::setValue('receipt_footer', $this->receiptFooter, 'string');
-        Setting::setValue('receipt_printer', $this->receiptPrinter, 'string');
-        Setting::setValue('receipt_template', $this->receiptTemplate, 'string');
-        Setting::setValue('receipt_show_address', $this->receiptShowAddress ? '1' : '0', 'boolean');
-        Setting::setValue('receipt_show_phone', $this->receiptShowPhone ? '1' : '0', 'boolean');
-        Setting::setValue('receipt_show_logo', $this->receiptShowLogo ? '1' : '0', 'boolean');
-        Setting::setValue('receipt_show_order_type', $this->receiptShowOrderType ? '1' : '0', 'boolean');
-        Setting::setValue('receipt_show_table', $this->receiptShowTable ? '1' : '0', 'boolean');
-        Setting::setValue('receipt_show_cashier', $this->receiptShowCashier ? '1' : '0', 'boolean');
-        Setting::setValue('receipt_show_modifiers', $this->receiptShowModifiers ? '1' : '0', 'boolean');
-        Setting::setValue('receipt_show_discount', $this->receiptShowDiscount ? '1' : '0', 'boolean');
-        Setting::setValue('receipt_show_payment', $this->receiptShowPayment ? '1' : '0', 'boolean');
-        Setting::setValue('receipt_show_notes', $this->receiptShowNotes ? '1' : '0', 'boolean');
+        Setting::setValue('shop_name', $state['shopName'], 'string');
+        Setting::setValue('shop_address', $state['shopAddress'], 'string');
+        Setting::setValue('shop_phone', $state['shopPhone'], 'string');
+        Setting::setValue('shop_logo', $state['shopLogo'][0] ?? '', 'string');
+        Setting::setValue('shop_currency', $state['shopCurrency'], 'string');
+        Setting::setValue('shop_tax_rate', (string) $state['shopTaxRate'], 'float');
+
+        Setting::setValue('payments_cash_enabled', $state['paymentsCashEnabled'] ? '1' : '0', 'boolean');
+        Setting::setValue('payments_khqr_enabled', $state['paymentsKhqrEnabled'] ? '1' : '0', 'boolean');
+        Setting::setValue('payments_provider', $state['paymentsProvider'], 'string');
+
+        Setting::setValue('receipt_header', $state['receiptHeader'], 'string');
+        Setting::setValue('receipt_footer', $state['receiptFooter'], 'string');
+        Setting::setValue('receipt_printer', $state['receiptPrinter'], 'string');
+        Setting::setValue('receipt_template', $state['receiptTemplate'], 'string');
+        Setting::setValue('receipt_show_address', $state['receiptShowAddress'] ? '1' : '0', 'boolean');
+        Setting::setValue('receipt_show_phone', $state['receiptShowPhone'] ? '1' : '0', 'boolean');
+        Setting::setValue('receipt_show_logo', $state['receiptShowLogo'] ? '1' : '0', 'boolean');
+        Setting::setValue('receipt_show_order_type', $state['receiptShowOrderType'] ? '1' : '0', 'boolean');
+        Setting::setValue('receipt_show_table', $state['receiptShowTable'] ? '1' : '0', 'boolean');
+        Setting::setValue('receipt_show_cashier', $state['receiptShowCashier'] ? '1' : '0', 'boolean');
+        Setting::setValue('receipt_show_modifiers', $state['receiptShowModifiers'] ? '1' : '0', 'boolean');
+        Setting::setValue('receipt_show_discount', $state['receiptShowDiscount'] ? '1' : '0', 'boolean');
+        Setting::setValue('receipt_show_payment', $state['receiptShowPayment'] ? '1' : '0', 'boolean');
+        Setting::setValue('receipt_show_notes', $state['receiptShowNotes'] ? '1' : '0', 'boolean');
 
         Notification::make()
             ->success()

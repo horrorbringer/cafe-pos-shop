@@ -41,7 +41,7 @@ class DigitalMenu extends Page
 
     public ?string $logoPath = null;
 
-    public ?string $whatsappNumber = null;
+    public bool $manuallyClosed = false;
 
     public ?string $openingHours = null;
 
@@ -50,6 +50,18 @@ class DigitalMenu extends Page
     public ?string $promoBannerText = null;
 
     public bool $enableKhmer = false;
+
+    public ?string $socialFacebook = null;
+
+    public ?string $socialInstagram = null;
+
+    public ?string $socialTiktok = null;
+
+    public ?string $socialYoutube = null;
+
+    public ?string $socialTelegram = null;
+
+    public ?string $socialTwitter = null;
 
     public static function canAccess(): bool
     {
@@ -63,7 +75,7 @@ class DigitalMenu extends Page
 
     public function getTitle(): string
     {
-        return 'Digital Menu';
+        return __('Digital Menu');
     }
 
     public function mount(): void
@@ -77,11 +89,20 @@ class DigitalMenu extends Page
         $this->menuSubtitle = Setting::getValue('digital_menu_subtitle', '');
         $this->primaryColor = Setting::getValue('digital_menu_color', '#f59e0b');
         $this->logoPath = Setting::getValue('digital_menu_logo', null);
-        $this->whatsappNumber = Setting::getValue('digital_menu_whatsapp', '');
+        $this->manuallyClosed = (bool) Setting::getValue('digital_menu_manually_closed', false);
         $this->openingHours = Setting::getValue('digital_menu_opening_hours', '7:00 AM - 9:00 PM');
         $this->promoBanner = Setting::getValue('digital_menu_promo_banner', '');
         $this->promoBannerText = Setting::getValue('digital_menu_promo_banner_text', 'Special Offer!');
         $this->enableKhmer = (bool) Setting::getValue('digital_menu_enable_khmer', false);
+
+        $socialLinks = Setting::getValue('digital_menu_social_links', []);
+        $this->socialFacebook = $socialLinks['facebook'] ?? '';
+        $this->socialInstagram = $socialLinks['instagram'] ?? '';
+        $this->socialTiktok = $socialLinks['tiktok'] ?? '';
+        $this->socialYoutube = $socialLinks['youtube'] ?? '';
+        $this->socialTelegram = $socialLinks['telegram'] ?? '';
+        $this->socialTwitter = $socialLinks['twitter'] ?? '';
+
     }
 
     public function saveTitle(): void
@@ -135,15 +156,15 @@ class DigitalMenu extends Page
         $this->notifySaved();
     }
 
-    public function saveWhatsapp(): void
+    public function saveOpeningHours(): void
     {
-        Setting::setValue('digital_menu_whatsapp', $this->whatsappNumber);
+        Setting::setValue('digital_menu_opening_hours', $this->openingHours ?: '7:00 AM - 9:00 PM');
         $this->notifySaved();
     }
 
-    public function saveOpeningHours(): void
+    public function saveManuallyClosed(): void
     {
-        Setting::setValue('digital_menu_opening_hours', $this->openingHours);
+        Setting::setValue('digital_menu_manually_closed', $this->manuallyClosed);
         $this->notifySaved();
     }
 
@@ -157,6 +178,20 @@ class DigitalMenu extends Page
     public function saveEnableKhmer(): void
     {
         Setting::setValue('digital_menu_enable_khmer', $this->enableKhmer ? '1' : '0', 'boolean');
+        $this->notifySaved();
+    }
+
+    public function saveSocialLinks(): void
+    {
+        Setting::setValue('digital_menu_social_links', json_encode([
+            'facebook' => $this->socialFacebook,
+            'instagram' => $this->socialInstagram,
+            'tiktok' => $this->socialTiktok,
+            'youtube' => $this->socialYoutube,
+            'telegram' => $this->socialTelegram,
+            'twitter' => $this->socialTwitter,
+        ]), 'json');
+
         $this->notifySaved();
     }
 
@@ -194,6 +229,7 @@ class DigitalMenu extends Page
             FileUpload::make('logoPath')
                 ->label('Logo')
                 ->image()
+                ->disk('public')
                 ->imageEditor()
                 ->directory('menu-logo')
                 ->maxSize(1024)
@@ -204,42 +240,6 @@ class DigitalMenu extends Page
                 ->label('Enabled')
                 ->live()
                 ->afterStateUpdated(fn () => $this->saveEnabled()),
-
-            TextInput::make('whatsappNumber')
-                ->label('WhatsApp Number')
-                ->placeholder('85512345678')
-                ->helperText('Include country code without +')
-                ->maxLength(20)
-                ->live(onBlur: true)
-                ->afterStateUpdated(fn () => $this->saveWhatsapp()),
-
-            TextInput::make('openingHours')
-                ->label('Opening Hours')
-                ->placeholder('7:00 AM - 9:00 PM')
-                ->maxLength(100)
-                ->live(onBlur: true)
-                ->afterStateUpdated(fn () => $this->saveOpeningHours()),
-
-            TextInput::make('promoBannerText')
-                ->label('Promo Banner Title')
-                ->placeholder('Special Offer!')
-                ->maxLength(100)
-                ->live(onBlur: true)
-                ->afterStateUpdated(fn () => $this->savePromoBanner()),
-
-            Textarea::make('promoBanner')
-                ->label('Promo Banner Description')
-                ->placeholder('20% off on all drinks today!')
-                ->rows(2)
-                ->maxLength(255)
-                ->live(onBlur: true)
-                ->afterStateUpdated(fn () => $this->savePromoBanner()),
-
-            Toggle::make('enableKhmer')
-                ->label('Enable Khmer Language Toggle')
-                ->helperText('Show language switcher for customers')
-                ->live()
-                ->afterStateUpdated(fn () => $this->saveEnableKhmer()),
         ];
     }
 }

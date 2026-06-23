@@ -51,7 +51,7 @@ class MenuManagement extends Page implements HasTable
 
     public function getTitle(): string
     {
-        return 'Menu Management';
+        return __('Menu Management');
     }
 
     public static function getNavigationIcon(): string|BackedEnum|null

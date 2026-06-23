@@ -57,7 +57,7 @@ class ReportsPage extends Page
 
     public function getTitle(): string
     {
-        return 'Sales Reports';
+        return __('Sales Reports');
     }
 
     public function updatedDateFilter(): void
@@ -157,7 +157,7 @@ class ReportsPage extends Page
     public function exportCsvAction(): Action
     {
         return Action::make('exportCsv')
-            ->label('Export CSV')
+            ->label(__('Export CSV'))
             ->icon('heroicon-o-arrow-down-tray')
             ->action(fn () => $this->exportCsv());
     }

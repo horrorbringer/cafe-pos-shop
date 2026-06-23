@@ -19,6 +19,7 @@ class ProductsTable
             ->columns([
                 ImageColumn::make('image')
                     ->circular()
+                    ->disk('public')
                     ->defaultImageUrl(url('/images/placeholder.svg'))
                     ->size(44),
 

@@ -177,12 +177,12 @@
             <div class="text-center text-xs" style="color:{{ $accentColor }};margin-top:4px">· &nbsp;· &nbsp;· &nbsp;· &nbsp;· &nbsp;· &nbsp;· &nbsp;·</div>
         @endif
 
-        <div class="text-center text-xs text-muted">Test Receipt &middot; {{ $template }} template</div>
+        <div class="text-center text-xs text-muted">{{ __('Test Receipt') }} &middot; {{ $template }} template</div>
     </div>
 
     <div style="text-align:center;margin-top:4px;font-size:10px;color:#a8a29e">Printed {{ date('d M Y, H:i') }}</div>
 
-    <button class="print-btn" onclick="window.print()">Print Receipt</button>
+    <button class="print-btn" onclick="window.print()">{{ __('Print Receipt') }}</button>
 
     <script>
         if (window.location.search.includes('print')) {

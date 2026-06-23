@@ -8,14 +8,23 @@
     <div class="flex-1 flex flex-col overflow-hidden min-w-0">
 
         {{-- Top Bar --}}
-        <div class="bg-white border-b border-stone-200 px-5 py-3 flex items-center justify-between shrink-0">
-            <div class="flex items-center gap-3">
+        <div class="bg-white border-b border-stone-200 px-5 py-3 flex items-center gap-3 shrink-0">
+            <div class="flex items-center gap-3 shrink-0">
                 <h1 class="text-lg font-bold text-stone-800 tracking-tight">POS</h1>
-                @if($this->order?->order_number)
-                    <span class="text-xs font-mono bg-stone-100 text-stone-500 px-2 py-0.5 rounded">{{ $this->order->order_number }}</span>
-                @endif
             </div>
-            <div class="flex items-center gap-2">
+
+            {{-- Search --}}
+            <div class="relative flex-1 max-w-md">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input type="text" wire:model.live.debounce.300ms="search" placeholder="{{ __('Search...') }}"
+                    class="w-full pl-9 pr-4 py-1.5 border border-stone-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-stone-50"
+                    x-ref="searchInput" x-init="$el.focus()">
+            </div>
+
+            <div class="flex items-center gap-2 ml-auto">
+                <x-language-switcher />
                 @if($this->itemCount > 0)
                     <button wire:click="cancelOrder"
                         class="text-xs text-stone-400 hover:text-red-500 hover:bg-red-50 px-2 py-1 rounded transition-colors">
@@ -25,44 +34,8 @@
             </div>
         </div>
 
-        {{-- Order Type + Search + Categories --}}
+        {{-- Categories + Order Type + Search --}}
         <div class="bg-white border-b border-stone-200 px-5 py-3 space-y-3 shrink-0">
-
-            {{-- Order Type Toggle --}}
-            <div class="flex items-center gap-1 bg-stone-100 rounded-lg p-1 w-fit">
-                <button wire:click="$set('orderType', 'dine_in')"
-                    class="px-4 py-1.5 rounded-md text-sm font-medium transition-all {{ $orderType === 'dine_in' ? 'bg-amber-500 text-white shadow-sm' : 'text-stone-600 hover:text-stone-800' }}">
-                    {{ __('Dine-in') }}
-                </button>
-                <button wire:click="$set('orderType', 'takeaway')"
-                    class="px-4 py-1.5 rounded-md text-sm font-medium transition-all {{ $orderType === 'takeaway' ? 'bg-amber-500 text-white shadow-sm' : 'text-stone-600 hover:text-stone-800' }}">
-                    {{ __('Takeaway') }}
-                </button>
-                <button wire:click="$set('orderType', 'delivery')"
-                    class="px-4 py-1.5 rounded-md text-sm font-medium transition-all {{ $orderType === 'delivery' ? 'bg-amber-500 text-white shadow-sm' : 'text-stone-600 hover:text-stone-800' }}">
-                    {{ __('Delivery') }}
-                </button>
-            </div>
-
-            <div class="flex items-center gap-3">
-                {{-- Table Number --}}
-                @if($orderType === 'dine_in')
-                    <div class="relative">
-                        <input type="text" wire:model.live="tableNumber" placeholder="{{ __('Table #') }}"
-                            class="w-20 px-3 py-2 border border-stone-200 rounded-lg text-sm text-center font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-stone-50">
-                    </div>
-                @endif
-
-                {{-- Search --}}
-                <div class="relative flex-1 max-w-md">
-                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                    <input type="text" wire:model.live.debounce.300ms="search" placeholder="{{ __('Search...') }}"
-                        class="w-full pl-9 pr-4 py-2 border border-stone-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-stone-50"
-                        x-ref="searchInput" x-init="$el.focus()">
-                </div>
-            </div>
 
             {{-- Categories --}}
             <div class="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
@@ -88,6 +61,32 @@
                     </button>
                     @endif
                 @endforeach
+            </div>
+
+            {{-- Order Type Toggle --}}
+            <div class="flex items-center gap-1 bg-stone-100 rounded-lg p-1 w-fit">
+                <button wire:click="$set('orderType', 'dine_in')"
+                    class="px-4 py-1.5 rounded-md text-sm font-medium transition-all {{ $orderType === 'dine_in' ? 'bg-amber-500 text-white shadow-sm' : 'text-stone-600 hover:text-stone-800' }}">
+                    {{ __('Dine-in') }}
+                </button>
+                <button wire:click="$set('orderType', 'takeaway')"
+                    class="px-4 py-1.5 rounded-md text-sm font-medium transition-all {{ $orderType === 'takeaway' ? 'bg-amber-500 text-white shadow-sm' : 'text-stone-600 hover:text-stone-800' }}">
+                    {{ __('Takeaway') }}
+                </button>
+                <button wire:click="$set('orderType', 'delivery')"
+                    class="px-4 py-1.5 rounded-md text-sm font-medium transition-all {{ $orderType === 'delivery' ? 'bg-amber-500 text-white shadow-sm' : 'text-stone-600 hover:text-stone-800' }}">
+                    {{ __('Delivery') }}
+                </button>
+            </div>
+
+            <div class="flex items-center gap-3">
+                {{-- Table Number --}}
+                @if($orderType === 'dine_in')
+                    <div class="relative">
+                        <input type="text" wire:model.live="tableNumber" placeholder="{{ __('Table #') }}"
+                            class="w-20 px-3 py-2 border border-stone-200 rounded-lg text-sm text-center font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-stone-50">
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -479,16 +478,29 @@
                     {{-- Quantity --}}
                     <div class="mb-5">
                         <label class="block text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2">{{ __('Quantity') }}</label>
-                        <div class="inline-flex items-center bg-stone-100 rounded-xl">
-                            <button wire:click="$set('itemQuantity', max(1, $this->itemQuantity - 1))"
-                                class="w-12 h-12 flex items-center justify-center text-stone-600 hover:text-stone-800 rounded-l-xl hover:bg-stone-200 transition-colors text-xl font-medium">
-                                &minus;
-                            </button>
-                            <span class="w-14 h-12 flex items-center justify-center text-lg font-bold text-stone-800">{{ $this->itemQuantity }}</span>
-                            <button wire:click="$set('itemQuantity', $this->itemQuantity + 1)"
-                                class="w-12 h-12 flex items-center justify-center text-stone-600 hover:text-stone-800 rounded-r-xl hover:bg-stone-200 transition-colors text-xl font-medium">
-                                +
-                            </button>
+                        <div class="flex items-center gap-3">
+                            <div class="inline-flex items-center bg-stone-100 rounded-xl">
+                                <button wire:click="$set('itemQuantity', max(1, $this->itemQuantity - 1))"
+                                    class="w-12 h-12 flex items-center justify-center text-stone-600 hover:text-stone-800 rounded-l-xl hover:bg-stone-200 transition-colors text-xl font-medium">
+                                    &minus;
+                                </button>
+                                <span class="w-14 h-12 flex items-center justify-center text-lg font-bold text-stone-800">{{ $this->itemQuantity }}</span>
+                                <button wire:click="$set('itemQuantity', $this->itemQuantity + 1)"
+                                    class="w-12 h-12 flex items-center justify-center text-stone-600 hover:text-stone-800 rounded-r-xl hover:bg-stone-200 transition-colors text-xl font-medium">
+                                    +
+                                </button>
+                            </div>
+                            <div class="flex gap-1.5">
+                                @foreach([1, 2, 3, 4, 5] as $qty)
+                                    <button wire:click="$set('itemQuantity', {{ $qty }})"
+                                        class="w-10 h-12 rounded-xl text-sm font-bold transition-all
+                                            {{ $this->itemQuantity === $qty
+                                                ? 'bg-amber-500 text-white shadow-sm'
+                                                : 'bg-stone-100 text-stone-600 hover:bg-stone-200' }}">
+                                        {{ $qty }}
+                                    </button>
+                                @endforeach
+                            </div>
                         </div>
                     </div>
 
@@ -592,20 +604,23 @@
                         <div class="mb-4">
                             <label class="block text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2">{{ __('Quick Amount') }}</label>
                             <div class="grid grid-cols-4 gap-2">
-                                @php
-                                    $denominations = config('pos.cash_denominations', [1, 2, 5, 10, 20, 50, 100]);
-                                    $quickAmounts = array_values(array_filter($denominations, fn($d) => $d >= $this->total));
-                                    if (empty($quickAmounts)) {
-                                        $quickAmounts = $denominations;
-                                    }
-                                @endphp
-                                @foreach($quickAmounts as $amount)
+                                @php $denominations = config('pos.cash_denominations', [1, 2, 5, 10, 20, 50, 100]); @endphp
+                                @foreach($denominations as $amount)
                                     <button wire:click="$set('amountTendered', {{ $amount }})"
-                                        class="py-2 rounded-lg bg-stone-100 hover:bg-stone-200 text-sm font-semibold text-stone-700 transition-colors
-                                            {{ $amountTendered == $amount ? 'ring-2 ring-amber-500 bg-amber-50' : '' }}">
+                                        class="py-2 rounded-lg text-sm font-semibold transition-colors
+                                            {{ $amountTendered == $amount
+                                                ? 'ring-2 ring-amber-500 bg-amber-50 text-amber-700'
+                                                : ($amount >= $this->total ? 'bg-stone-100 hover:bg-stone-200 text-stone-700' : 'bg-stone-50 text-stone-400') }}">
                                         ${{ $amount }}
                                     </button>
                                 @endforeach
+                                <button wire:click="$set('amountTendered', {{ $this->total }})"
+                                    class="py-2 rounded-lg text-sm font-bold transition-colors
+                                        {{ $amountTendered == $this->total
+                                            ? 'ring-2 ring-green-500 bg-green-50 text-green-700'
+                                            : 'bg-green-100 hover:bg-green-200 text-green-700' }}">
+                                    {{ __('Exact') }}
+                                </button>
                             </div>
                         </div>
 

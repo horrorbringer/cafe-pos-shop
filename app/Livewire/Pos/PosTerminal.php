@@ -117,12 +117,6 @@ class PosTerminal extends Component
     public function updatedOrderType(string $value): void
     {
         if ($this->order) {
-            if ($value === 'dine_in' && empty($this->tableNumber)) {
-                $this->dispatch('show-toast', message: 'Table number required for dine-in', type: 'error');
-                $this->orderType = 'takeaway';
-
-                return;
-            }
             $this->order->update(['order_type' => $value]);
         }
     }
@@ -218,13 +212,13 @@ class PosTerminal extends Component
     public function holdOrder(): void
     {
         if ($this->itemCount === 0) {
-            $this->dispatch('show-toast', message: 'Cart is empty', type: 'error');
+            $this->dispatch('show-toast', message: __('Cart is empty'), type: 'error');
 
             return;
         }
 
         $this->order->update(['notes' => $this->orderNotes ?: null]);
-        $this->dispatch('show-toast', message: 'Order held', type: 'success');
+        $this->dispatch('show-toast', message: __('Order held'), type: 'success');
         $this->startNewOrder();
     }
 
@@ -242,7 +236,7 @@ class PosTerminal extends Component
         $this->tableNumber = $order->table_number;
         $this->showSuspendedOrders = false;
 
-        $this->dispatch('show-toast', message: 'Order resumed', type: 'success');
+        $this->dispatch('show-toast', message: __('Order resumed'), type: 'success');
     }
 
     public function openModifierModal(int $productId): void
@@ -250,7 +244,7 @@ class PosTerminal extends Component
         $product = Product::with(['variants', 'modifierGroups.options'])->findOrFail($productId);
 
         if ($product->stock_quantity <= 0) {
-            $this->dispatch('show-toast', message: 'Product is out of stock', type: 'error');
+            $this->dispatch('show-toast', message: __('Product is out of stock'), type: 'error');
 
             return;
         }
@@ -355,7 +349,7 @@ class PosTerminal extends Component
         $product = Product::with(['variants', 'modifierGroups.options'])->findOrFail($productId);
 
         if ($product->stock_quantity <= 0) {
-            $this->dispatch('show-toast', message: 'Product is out of stock', type: 'error');
+            $this->dispatch('show-toast', message: __('Product is out of stock'), type: 'error');
 
             return;
         }
@@ -432,7 +426,13 @@ class PosTerminal extends Component
     public function openPaymentModal(): void
     {
         if ($this->itemCount === 0) {
-            $this->dispatch('show-toast', message: 'Cart is empty', type: 'error');
+            $this->dispatch('show-toast', message: __('Cart is empty'), type: 'error');
+
+            return;
+        }
+
+        if ($this->orderType === 'dine_in' && empty($this->tableNumber)) {
+            $this->dispatch('show-toast', message: 'Please enter a table number for dine-in', type: 'error');
 
             return;
         }
@@ -469,7 +469,7 @@ class PosTerminal extends Component
 
             $this->dispatch('start-qr-timer', seconds: $this->qrExpirySeconds);
         } else {
-            $this->dispatch('show-toast', message: 'Failed to generate KHQR code', type: 'error');
+            $this->dispatch('show-toast', message: __('Failed to generate KHQR code'), type: 'error');
         }
 
         $this->processing = false;
@@ -507,14 +507,14 @@ class PosTerminal extends Component
                 $this->showPaymentModal = false;
                 $this->showReceiptModal = true;
 
-                $this->dispatch('show-toast', message: 'Payment confirmed! Receipt printed.', type: 'success');
+                $this->dispatch('show-toast', message: __('Payment confirmed! Receipt printed.'), type: 'success');
             } else {
-                $this->dispatch('show-toast', message: 'Waiting for customer to pay...', type: 'info');
+                $this->dispatch('show-toast', message: __('Waiting for customer to pay...'), type: 'info');
             }
 
             $this->processing = false;
         } catch (\Exception $e) {
-            $this->dispatch('show-toast', message: 'Error checking payment status', type: 'error');
+            $this->dispatch('show-toast', message: __('Error checking payment status'), type: 'error');
             $this->processing = false;
         }
     }
@@ -523,7 +523,7 @@ class PosTerminal extends Component
     {
         if ($this->paymentMethod === 'cash') {
             if ($this->amountTendered < $this->total) {
-                $this->dispatch('show-toast', message: 'Insufficient payment amount', type: 'error');
+                $this->dispatch('show-toast', message: __('Insufficient payment amount'), type: 'error');
 
                 return;
             }
@@ -570,7 +570,7 @@ class PosTerminal extends Component
         $order = Order::findOrFail($this->order->id);
         $this->receiptService->print($order);
 
-        $this->dispatch('show-toast', message: 'Receipt sent to printer', type: 'success');
+        $this->dispatch('show-toast', message: __('Receipt sent to printer'), type: 'success');
     }
 
     public function newOrder(): void

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Orders\Tables;
 
 use App\Domain\Shared\Enums\OrderStatus;
 use App\Domain\Shared\Enums\OrderType;
+use App\Domain\Shared\Enums\PaymentMethod;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -73,10 +74,10 @@ class OrdersTable
 
                 IconColumn::make('payments.method')
                     ->label('Paid via')
-                    ->icon(fn ($state) => match ($state) {
-                        'cash' => 'heroicon-o-banknotes',
-                        'card' => 'heroicon-o-credit-card',
-                        'qr' => 'heroicon-o-device-phone-mobile',
+                    ->icon(fn (?PaymentMethod $state) => match ($state) {
+                        PaymentMethod::Cash => 'heroicon-o-banknotes',
+                        PaymentMethod::Card => 'heroicon-o-credit-card',
+                        PaymentMethod::Qr => 'heroicon-o-device-phone-mobile',
                         default => 'heroicon-o-question-mark-circle',
                     })
                     ->state(fn ($record) => $record->payments->first()?->method)

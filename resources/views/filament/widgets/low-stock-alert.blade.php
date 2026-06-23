@@ -1,6 +1,6 @@
 <x-filament-widgets::widget>
     <x-filament::section
-        heading="Low Stock"
+        heading="{{ __('Low Stock') }}"
         icon="heroicon-o-exclamation-triangle"
         :footer-content="false"
     >
@@ -9,7 +9,7 @@
         @if ($items->isEmpty())
             <div class="flex flex-col items-center justify-center py-8 text-gray-400">
                 <x-filament::icon icon="heroicon-o-check-circle" class="w-10 h-10 mb-2" />
-                <p class="text-sm">All stocked up</p>
+                <p class="text-sm">{{ __('All stocked up') }}</p>
             </div>
         @else
             <div class="space-y-2">
@@ -27,7 +27,7 @@
                             </span>
                             <span class="text-xs text-gray-400">{{ $item->unit }}</span>
                             <x-filament::badge color="danger" size="sm">
-                                Low
+                                {{ __('Low') }}
                             </x-filament::badge>
                         </div>
                     </div>

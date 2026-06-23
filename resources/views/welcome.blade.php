@@ -88,7 +88,7 @@
         </main>
 
         <footer class="px-6 py-4 text-center text-sm text-gray-400 dark:text-gray-600">
-            &copy; {{ date('Y') }} {{ config('app.name', 'POS Cafe') }}. All rights reserved.
+            &copy; {{ date('Y') }} {{ config('app.name', 'POS Cafe') }}. {{ __('All rights reserved.') }}
         </footer>
     </div>
 </body>

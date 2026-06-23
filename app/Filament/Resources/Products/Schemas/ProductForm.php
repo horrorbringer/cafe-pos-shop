@@ -29,6 +29,7 @@ class ProductForm
                             ->label('Photo')
                             ->image()
                             ->imageEditor()
+                            ->disk('public')
                             ->directory('products')
                             ->maxSize(2048)
                             ->columnSpanFull(),

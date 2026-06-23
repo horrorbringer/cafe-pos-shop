@@ -15,10 +15,6 @@
     @livewireStyles
 </head>
 <body class="font-sans antialiased bg-gray-100">
-    <div class="fixed top-0 right-0 z-50 p-3">
-        <x-language-switcher />
-    </div>
-
     {{ $slot }}
 
     @livewireScripts

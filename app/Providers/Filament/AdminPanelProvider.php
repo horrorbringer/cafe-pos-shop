@@ -16,12 +16,12 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
@@ -49,38 +49,32 @@ class AdminPanelProvider extends PanelProvider
                 SalesChart::class,
                 TopProducts::class,
                 LowStockAlert::class,
-                AccountWidget::class,
             ])
             ->navigationGroups([
-                'Dashboard',
-                'Orders',
-                'Menu',
-                'Inventory',
-                'Reports',
-                'Settings',
+                __('Dashboard'),
+                __('Orders'),
+                __('Menu'),
+                __('Inventory'),
+                __('Reports'),
+                __('Settings'),
             ])
             ->navigationItems([
-                NavigationItem::make('POS Terminal')
+                NavigationItem::make(__('POS Terminal'))
                     ->url(fn (): string => url('/pos'))
                     ->icon('heroicon-o-shopping-cart')
                     ->group('Orders')
                     ->sort(0)
                     ->isActiveWhen(fn () => request()->is('pos*')),
-
-                NavigationItem::make('English')
-                    ->url(fn (): string => route('language.switch', 'en'))
-                    ->icon('heroicon-o-language')
-                    ->group('Settings')
-                    ->sort(20)
-                    ->visible(fn (): bool => app()->getLocale() !== 'en'),
-
-                NavigationItem::make('Khmer')
-                    ->url(fn (): string => route('language.switch', 'km'))
-                    ->icon('heroicon-o-language')
-                    ->group('Settings')
-                    ->sort(21)
-                    ->visible(fn (): bool => app()->getLocale() !== 'km'),
             ])
+            ->renderHook('panels::user-menu.before', fn () => Blade::render('
+                @foreach(array_filter(config(\'app.supported_locales\', []), fn ($l) => $l !== app()->getLocale()) as $code)
+                    <a href="{{ route(\'language.switch\', $code) }}"
+                        class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <x-heroicon-o-language class="w-5 h-5 text-gray-400" />
+                        <span>{{ $code === \'en\' ? __(\'English\') : __(ucfirst($code)) }}</span>
+                    </a>
+                @endforeach
+            '))
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

@@ -1,6 +1,6 @@
 <x-filament-widgets::widget>
     <x-filament::section
-        heading="Top Products Today"
+        heading="{{ __('Top Products Today') }}"
         icon="heroicon-o-trophy"
         :footer-content="false"
     >
@@ -9,7 +9,7 @@
         @if (empty($products))
             <div class="flex flex-col items-center justify-center py-8 text-gray-400">
                 <x-filament::icon icon="heroicon-o-shopping-cart" class="w-10 h-10 mb-2" />
-                <p class="text-sm">No sales yet today</p>
+                <p class="text-sm">{{ __('No sales yet today') }}</p>
             </div>
         @else
             <div class="space-y-3">

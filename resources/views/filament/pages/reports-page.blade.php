@@ -6,11 +6,11 @@
             <div class="flex items-center bg-white dark:bg-gray-900 rounded-xl p-1 ring-1 ring-gray-950/5 dark:ring-white/10">
                 @php
                     $filters = [
-                        'today' => 'Today',
-                        'yesterday' => 'Yesterday',
-                        'last-7-days' => '7 Days',
-                        'last-30-days' => '30 Days',
-                        'custom' => 'Custom',
+                        'today' => __('Today'),
+                        'yesterday' => __('Yesterday'),
+                        'last-7-days' => __('7 Days'),
+                        'last-30-days' => __('30 Days'),
+                        'custom' => __('Custom'),
                     ];
                 @endphp
                 @foreach($filters as $value => $label)
@@ -53,7 +53,7 @@
                         <x-heroicon-o-banknotes class="w-5 h-5 text-success-600 dark:text-success-400" />
                     </div>
                     <div>
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Total Sales</p>
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ __('Total Sales') }}</p>
                         <p class="text-xl font-bold text-success-600 dark:text-success-400">${{ number_format($totalSales, 2) }}</p>
                     </div>
                 </div>
@@ -65,7 +65,7 @@
                         <x-heroicon-o-currency-dollar class="w-5 h-5 text-warning-600 dark:text-warning-400" />
                     </div>
                     <div>
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Cash Sales</p>
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ __('Cash Sales') }}</p>
                         <p class="text-xl font-bold text-warning-600 dark:text-warning-400">${{ number_format($cashSales, 2) }}</p>
                     </div>
                 </div>
@@ -77,7 +77,7 @@
                         <x-heroicon-o-qr-code class="w-5 h-5 text-info-600 dark:text-info-400" />
                     </div>
                     <div>
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">KHQR Sales</p>
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ __('KHQR Sales') }}</p>
                         <p class="text-xl font-bold text-info-600 dark:text-info-400">${{ number_format($khqrSales, 2) }}</p>
                     </div>
                 </div>
@@ -89,7 +89,7 @@
                         <x-heroicon-o-shopping-cart class="w-5 h-5 text-primary-600 dark:text-primary-400" />
                     </div>
                     <div>
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Orders</p>
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ __('Orders') }}</p>
                         <p class="text-xl font-bold text-primary-600 dark:text-primary-400">{{ number_format($orderCount) }}</p>
                     </div>
                 </div>
@@ -101,7 +101,7 @@
                         <x-heroicon-o-arrow-uturn-left class="w-5 h-5 text-danger-600 dark:text-danger-400" />
                     </div>
                     <div>
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Refunds</p>
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ __('Refunds') }}</p>
                         <p class="text-xl font-bold text-danger-600 dark:text-danger-400">${{ number_format($refundAmount, 2) }}</p>
                     </div>
                 </div>
@@ -111,7 +111,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             {{-- Revenue Breakdown --}}
-            <x-filament::section heading="Revenue Breakdown" icon="heroicon-o-chart-bar" icon-color="gray">
+            <x-filament::section heading="{{ __('Revenue Breakdown') }}" icon="heroicon-o-chart-bar" icon-color="gray">
 
                 <div class="space-y-4">
                     @if($totalSales > 0)
@@ -133,7 +133,7 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <span class="w-2.5 h-2.5 rounded-full bg-warning-400 dark:bg-warning-500"></span>
-                                <span class="text-sm text-gray-600 dark:text-gray-400">Cash</span>
+                                <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('Cash') }}</span>
                             </div>
                             <div class="text-right">
                                 <span class="text-sm font-semibold text-gray-950 dark:text-white">${{ number_format($cashSales, 2) }}</span>
@@ -146,7 +146,7 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <span class="w-2.5 h-2.5 rounded-full bg-info-400 dark:bg-info-500"></span>
-                                <span class="text-sm text-gray-600 dark:text-gray-400">KHQR</span>
+                                <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('KHQR') }}</span>
                             </div>
                             <div class="text-right">
                                 <span class="text-sm font-semibold text-gray-950 dark:text-white">${{ number_format($khqrSales, 2) }}</span>
@@ -160,14 +160,14 @@
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
                                     <span class="w-2.5 h-2.5 rounded-full bg-danger-400 dark:bg-danger-500"></span>
-                                    <span class="text-sm text-gray-600 dark:text-gray-400">Refunds</span>
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ __('Refunds') }}</span>
                                 </div>
                                 <span class="text-sm font-semibold text-danger-600 dark:text-danger-400">-${{ number_format($refundAmount, 2) }}</span>
                             </div>
                         @endif
 
                         <div class="border-t border-gray-100 dark:border-white/5 pt-3 flex items-center justify-between">
-                            <span class="text-sm font-bold text-gray-950 dark:text-white">Net Revenue</span>
+                            <span class="text-sm font-bold text-gray-950 dark:text-white">{{ __('Net Revenue') }}</span>
                             <span class="text-lg font-bold text-success-600 dark:text-success-400">${{ number_format($netRevenue, 2) }}</span>
                         </div>
                     </div>
@@ -176,7 +176,7 @@
 
             {{-- Top Products --}}
             <x-filament::section
-                heading="Top Products"
+                heading="{{ __('Top Products') }}"
                 icon="heroicon-o-trophy"
                 icon-color="warning"
                 class="lg:col-span-2"
@@ -189,8 +189,8 @@
 
                 @if($topProducts->isEmpty())
                     <x-filament::empty-state
-                        heading="No sales data"
-                        description="No products sold in this period"
+                        heading="{{ __('No sales data') }}"
+                        description="{{ __('No products sold in this period') }}"
                         icon="heroicon-o-document-text"
                     />
                 @else
