@@ -12,11 +12,9 @@ use Carbon\Carbon;
 use chillerlan\QRCode\Output\QROutputInterface;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use KHQR\BakongKHQR;
 use KHQR\Helpers\KHQRData;
-use KHQR\Helpers\Utils;
 use KHQR\Models\IndividualInfo;
 
 class BakongProvider implements PaymentProvider
@@ -44,64 +42,58 @@ class BakongProvider implements PaymentProvider
     {
         $request->validate();
 
-        // Generate real KHQR locally using the SDK (no API call needed)
         try {
             $shopName = Setting::getValue('shop_name') ?: config('app.name', 'POS Cafe');
             $shopAddress = Setting::getValue('shop_address') ?: 'Phnom Penh';
-            $bakongAccountId = ! empty($this->merchantId) ? $this->merchantId : 'dev@nbc';
-            $acquiringBank = ! empty($this->acquiringBank) ? $this->acquiringBank : 'NBC';
+            $bakongAccountId = $this->merchantId ?: 'dev@nbc';
+            $expiryMinutes = $request->expiryMinutes ?? 15;
 
-            $currencyMap = [
-                'KHR' => KHQRData::CURRENCY_KHR,
-                'USD' => KHQRData::CURRENCY_USD,
-            ];
-
-            $individualInfo = IndividualInfo::withOptionalArray(
+            $payment = new IndividualInfo(
                 bakongAccountID: $bakongAccountId,
                 merchantName: $shopName,
                 merchantCity: $shopAddress,
-                optionalData: [
-                    'acquiringBank' => $acquiringBank,
-                    'currency' => $currencyMap[$request->currency] ?? KHQRData::CURRENCY_USD,
-                    'amount' => $request->amount,
-                    'billNumber' => $request->orderNumber,
-                    'mobileNumber' => $this->mobileNumber ?: null,
-                ],
+                currency: $request->currency === 'KHR' ? KHQRData::CURRENCY_KHR : KHQRData::CURRENCY_USD,
+                amount: $request->amount,
+                billNumber: $request->orderNumber,
+                mobileNumber: $this->mobileNumber ?: null,
+                acquiringBank: $this->acquiringBank ?: null,
+                purposeOfTransaction: 'Checkout payment',
+                expirationTimestamp: (string) floor((microtime(true) + $expiryMinutes * 60) * 1000),
             );
 
-            $response = BakongKHQR::generateIndividual($individualInfo);
-            $qrString = $response->data['qr'] ?? '';
-            $md5Hash = $response->data['md5'] ?? '';
+            $result = BakongKHQR::generateIndividual($payment);
 
-            if ($qrString !== '' && $md5Hash !== '') {
-                $expiryMinutes = $request->expiryMinutes ?? 15;
-                $qrString = $this->injectExpirationTimestamp($qrString, $expiryMinutes);
-                $base64Png = $this->renderQrImage($qrString);
-
-                $isDev = empty($this->merchantId);
-                $newMd5 = md5($qrString);
-
-                return new PaymentQr(
-                    providerReference: $isDev ? 'dev_'.now()->timestamp.'_'.uniqid() : $newMd5,
-                    qrData: $base64Png,
-                    qrImageUrl: '',
-                    amount: $request->amount,
-                    currency: $request->currency,
-                    expiresAt: now()->addMinutes($expiryMinutes),
-                    rawPayload: $isDev
-                        ? ['mock' => true, 'md5' => $newMd5, 'qr_emv' => $qrString]
-                        : ['md5' => $newMd5, 'qr_emv' => $qrString],
-                );
+            if ($result->status['code'] !== 0) {
+                throw new \RuntimeException($result->status['message'] ?? 'Failed to generate KHQR code');
             }
 
-            Log::warning('Local KHQR generation returned empty data');
-        } catch (\Exception $e) {
-            Log::warning('Local KHQR generation failed, falling back', [
-                'error' => $e->getMessage(),
-            ]);
-        }
+            $qrString = $result->data['qr'] ?? '';
+            $md5 = $result->data['md5'] ?? '';
 
-        throw new \RuntimeException('Failed to generate KHQR code');
+            if ($qrString === '' || $md5 === '') {
+                throw new \RuntimeException('Failed to generate KHQR code');
+            }
+
+            $base64Png = $this->renderQrImage($qrString);
+
+            $isDev = empty($this->merchantId);
+
+            return new PaymentQr(
+                providerReference: $isDev ? 'dev_'.now()->timestamp.'_'.uniqid() : $md5,
+                qrData: $base64Png,
+                qrImageUrl: '',
+                amount: $request->amount,
+                currency: $request->currency,
+                expiresAt: now()->addMinutes($expiryMinutes),
+                rawPayload: $isDev
+                    ? ['mock' => true, 'md5' => $md5, 'qr_emv' => $qrString]
+                    : ['md5' => $md5, 'qr_emv' => $qrString],
+            );
+        } catch (\Exception $e) {
+            Log::warning('KHQR generation failed', ['error' => $e->getMessage()]);
+
+            throw new \RuntimeException('Failed to generate KHQR code', previous: $e);
+        }
     }
 
     public function checkStatus(string $providerReference): PaymentStatus
@@ -124,93 +116,46 @@ class BakongProvider implements PaymentProvider
             );
         }
 
-        // For locally generated KHQR, try the MD5-based status endpoint first.
-        // If the API returns Paid/Expired/Failed, return immediately.
-        // If Pending, fall through to the DB-based auto-confirm fallback.
+        // Check transaction by MD5 via Bakong API
         if (strlen($providerReference) === 32 && ctype_xdigit($providerReference)) {
             try {
                 $isSandbox = str_contains($this->baseUrl, 'sit-');
-                $bakongKHQR = new BakongKHQR($this->accessToken);
-                $result = $bakongKHQR->checkTransactionByMD5($providerReference, $isSandbox);
+                $bakong = new BakongKHQR($this->accessToken);
+                $result = $bakong->checkTransactionByMD5($providerReference, $isSandbox);
 
-                $data = $result['data'] ?? $result;
+                $isPaid = ($result['responseCode'] ?? null) === 0 && ! empty($result['data']);
 
-                $status = match ($data['status'] ?? 'PENDING') {
-                    'PAID', 'SUCCESS' => PaymentStatusType::Paid,
-                    'EXPIRED' => PaymentStatusType::Expired,
-                    'FAILED', 'REJECTED' => PaymentStatusType::Failed,
-                    default => PaymentStatusType::Pending,
-                };
+                if ($isPaid) {
+                    $data = $result['data'];
 
-                if ($status !== PaymentStatusType::Pending) {
                     return new PaymentStatus(
-                        status: $status,
+                        status: PaymentStatusType::Paid,
                         providerReference: $providerReference,
-                        transactionReference: $data['transactionId'] ?? $data['referenceId'] ?? null,
+                        transactionReference: $data['hash'] ?? null,
                         amount: isset($data['amount']) ? (float) $data['amount'] : null,
                         currency: $data['currency'] ?? null,
-                        message: $data['message'] ?? ($result['message'] ?? null),
-                        paidAt: isset($data['paidAt']) ? Carbon::parse($data['paidAt']) : null,
-                        rawPayload: $data,
+                        message: $result['responseMessage'] ?? 'Payment successful',
+                        paidAt: isset($data['createdDateMs']) ? Carbon::parse($data['createdDateMs']) : now(),
+                        rawPayload: $result,
                     );
                 }
+
+                Log::info('Bakong payment not yet confirmed', [
+                    'reference' => $providerReference,
+                    'responseCode' => $result['responseCode'] ?? null,
+                ]);
             } catch (\Exception $e) {
-                Log::warning('Bakong MD5 status check failed, trying legacy endpoint', [
+                Log::warning('Bakong status check failed', [
                     'reference' => $providerReference,
                     'error' => $e->getMessage(),
                 ]);
             }
         }
 
-        // Fallback to legacy GET endpoint
-        try {
-            $response = Http::withToken($this->accessToken)
-                ->timeout(10)
-                ->get("{$this->baseUrl}/kak/api/dynamic-qr/v1/check-status/{$providerReference}");
-
-            if ($response->successful()) {
-                $data = $response->json('data', $response->json());
-
-                $status = match ($data['status'] ?? 'PENDING') {
-                    'PAID', 'SUCCESS' => PaymentStatusType::Paid,
-                    'EXPIRED' => PaymentStatusType::Expired,
-                    'FAILED', 'REJECTED' => PaymentStatusType::Failed,
-                    default => PaymentStatusType::Pending,
-                };
-
-                if ($status !== PaymentStatusType::Pending) {
-                    return new PaymentStatus(
-                        status: $status,
-                        providerReference: $providerReference,
-                        transactionReference: $data['transactionId'] ?? null,
-                        amount: isset($data['amount']) ? (float) $data['amount'] : null,
-                        currency: $data['currency'] ?? null,
-                        message: $data['message'] ?? null,
-                        paidAt: isset($data['paidAt']) ? Carbon::parse($data['paidAt']) : null,
-                        rawPayload: $data,
-                    );
-                }
-
-                Log::info('Bakong status check returned pending', [
-                    'reference' => $providerReference,
-                ]);
-            } else {
-                Log::warning('Bakong status check API error', [
-                    'reference' => $providerReference,
-                    'status' => $response->status(),
-                ]);
-            }
-        } catch (\Exception $e) {
-            Log::warning('Bakong status check connection failed', [
-                'reference' => $providerReference,
-                'error' => $e->getMessage(),
-            ]);
-        }
-
         return new PaymentStatus(
             status: PaymentStatusType::Pending,
             providerReference: $providerReference,
-            message: 'Payment status unknown',
+            message: 'Waiting for payment.',
         );
     }
 
@@ -251,41 +196,6 @@ class BakongProvider implements PaymentProvider
     public function isAvailable(): bool
     {
         return ! empty($this->accessToken) && ! empty($this->merchantId);
-    }
-
-    private function injectExpirationTimestamp(string $qrString, int $expiryMinutes = 15): string
-    {
-        $qrNoCrc = substr($qrString, 0, -8);
-        $pos = 0;
-        $before99 = '';
-        $tag99Value = '';
-        $after99 = '';
-
-        while ($pos < strlen($qrNoCrc)) {
-            $tag = substr($qrNoCrc, $pos, 2);
-            $len = (int) substr($qrNoCrc, $pos + 2, 2);
-            $value = substr($qrNoCrc, $pos + 4, $len);
-            $nextPos = $pos + 4 + $len;
-
-            if ($tag === '99') {
-                $before99 = substr($qrNoCrc, 0, $pos);
-                $tag99Value = $value;
-                $after99 = substr($qrNoCrc, $nextPos);
-                break;
-            }
-
-            $pos = $nextPos;
-        }
-
-        if ($tag99Value === '') {
-            return $qrString;
-        }
-
-        $expirationMs = (string) floor(now()->addMinutes($expiryMinutes)->timestamp * 1000);
-        $tag99Value .= '01'.str_pad((string) strlen($expirationMs), 2, '0', STR_PAD_LEFT).$expirationMs;
-        $newQrNoCrc = $before99.'99'.str_pad((string) strlen($tag99Value), 2, '0', STR_PAD_LEFT).$tag99Value.$after99;
-
-        return $newQrNoCrc.'6304'.Utils::crc16($newQrNoCrc.'6304');
     }
 
     private function renderQrImage(string $data): string

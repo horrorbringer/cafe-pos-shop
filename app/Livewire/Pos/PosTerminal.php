@@ -499,13 +499,15 @@ class PosTerminal extends Component
 
                 $order = app(CompleteOrderAction::class)->execute($order, Auth::user());
 
+                $this->order = $order;
                 $this->receiptContent = $this->receiptService->generateReceiptContent($order);
+                $this->receiptService->print($order);
                 $this->khqrData = null;
                 $this->showKhqrModal = false;
                 $this->showPaymentModal = false;
                 $this->showReceiptModal = true;
 
-                $this->dispatch('show-toast', message: 'Payment confirmed!', type: 'success');
+                $this->dispatch('show-toast', message: 'Payment confirmed! Receipt printed.', type: 'success');
             } else {
                 $this->dispatch('show-toast', message: 'Waiting for customer to pay...', type: 'info');
             }
@@ -537,7 +539,9 @@ class PosTerminal extends Component
 
             $order = app(CompleteOrderAction::class)->execute($order, Auth::user());
 
+            $this->order = $order;
             $this->receiptContent = $this->receiptService->generateReceiptContent($order);
+            $this->receiptService->print($order);
             $this->showPaymentModal = false;
             $this->showReceiptModal = true;
 

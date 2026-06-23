@@ -169,6 +169,9 @@ class ReceiptPrinterService
             $lines[] = $this->wrapText($footer, $width);
         }
 
+        $lines[] = '';
+        $lines[] = str_pad(__('Thank you for your visit!'), $width, ' ', STR_PAD_BOTH);
+
         if ($outer) {
             $lines[] = $outer;
         } else {

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f6bad39f9a5e11f8e67dbb4c841823f2",
+    "content-hash": "12dff017d3a0cdfa61503b5d11394829",
     "packages": [
         {
             "name": "blade-ui-kit/blade-heroicons",
@@ -923,6 +923,65 @@
                 }
             ],
             "time": "2025-03-06T22:45:56+00:00"
+        },
+        {
+            "name": "fidele007/bakong-khqr-php",
+            "version": "v1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fidele007/bakong-khqr-php.git",
+                "reference": "274ba40d9cea86a83055285839dafd6c1edea337"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fidele007/bakong-khqr-php/zipball/274ba40d9cea86a83055285839dafd6c1edea337",
+                "reference": "274ba40d9cea86a83055285839dafd6c1edea337",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.21",
+                "phpstan/phpstan": "^2.1.8",
+                "phpunit/phpunit": "^9.6",
+                "rector/rector": "^2.0.10",
+                "roave/security-advisories": "dev-latest"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "KHQR\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Force Fidele KIEN",
+                    "email": "forcefidele@gmail.com",
+                    "homepage": "https://fidele007.github.io",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A pure PHP implementation of the Bakong KHQR SDK",
+            "keywords": [
+                "bakong",
+                "khqr"
+            ],
+            "support": {
+                "issues": "https://github.com/fidele007/bakong-khqr-php/issues",
+                "source": "https://github.com/fidele007/bakong-khqr-php/tree/v1.2.0"
+            },
+            "funding": [
+                {
+                    "url": "https://www.github.com/sponsors/fidele007",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-05-09T14:30:10+00:00"
         },
         {
             "name": "filament/actions",
@@ -1959,58 +2018,6 @@
                 }
             ],
             "time": "2026-06-12T21:33:43+00:00"
-        },
-        {
-            "name": "khqr-gateway/bakong-khqr-php",
-            "version": "v1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/davysrp/khqr-gateway.git",
-                "reference": "1df08d33ebb85b3b6b284205c422c3d6d8433973"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/davysrp/khqr-gateway/zipball/1df08d33ebb85b3b6b284205c422c3d6d8433973",
-                "reference": "1df08d33ebb85b3b6b284205c422c3d6d8433973",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.4"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "KHQR\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Force Fidele KIEN",
-                    "email": "forcefidele@gmail.com",
-                    "homepage": "https://fidele007.github.io",
-                    "role": "Developer"
-                }
-            ],
-            "description": "A pure PHP implementation of the Bakong KHQR SDK",
-            "keywords": [
-                "bakong",
-                "khqr"
-            ],
-            "support": {
-                "issues": "https://github.com/fidele007/bakong-khqr-php/issues",
-                "source": "https://github.com/davysrp/khqr-gateway/tree/v1.0.0"
-            },
-            "funding": [
-                {
-                    "url": "https://www.github.com/sponsors/fidele007",
-                    "type": "github"
-                }
-            ],
-            "time": "2025-05-08T09:06:57+00:00"
         },
         {
             "name": "kirschbaum-development/eloquent-power-joins",

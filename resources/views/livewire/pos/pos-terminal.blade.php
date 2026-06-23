@@ -751,32 +751,32 @@
             x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0"
             x-transition:enter-end="opacity-100">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md"
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-auto"
                 x-transition:enter="transition ease-out duration-200"
                 x-transition:enter-start="opacity-0 scale-95"
                 x-transition:enter-end="opacity-100 scale-100">
-                <div class="p-6">
-                    <div class="text-center mb-5">
-                        <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                            <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <div class="p-5">
+                    <div class="text-center mb-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                         </div>
-                        <h3 class="text-lg font-bold text-stone-800">{{ __('Payment Complete') }}</h3>
-                        <p class="text-sm text-stone-400 mt-1">{{ __('Order has been processed successfully') }}</p>
+                        <h3 class="text-base font-bold text-stone-800">{{ __('Payment Complete') }}</h3>
+                        <p class="text-xs text-stone-400 mt-0.5">{{ __('Order has been processed successfully') }}</p>
                     </div>
 
-                    <div class="bg-stone-50 rounded-xl p-4 mb-5 font-mono text-xs whitespace-pre-wrap text-stone-600 max-h-60 overflow-y-auto border border-stone-200"
+                    <div class="bg-white rounded-xl p-3 font-mono text-xs leading-relaxed whitespace-pre-wrap text-stone-700 border border-stone-200 shadow-inner"
                         x-data="{ printing: false }">
                         {{ $receiptContent }}
                     </div>
 
-                    <div class="flex gap-3">
+                    <div class="flex gap-2.5 mt-4">
                         <button wire:click="printReceipt"
-                            class="flex-1 px-4 py-3 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
+                            class="flex-1 px-3 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl font-semibold transition-colors flex items-center justify-center gap-1.5 text-sm">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 18v4h12v-4M6 18v-2h12v2"/></svg>
                             {{ __('Print') }}
                         </button>
                         <button wire:click="newOrder"
-                            class="flex-1 px-4 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold transition-colors shadow-sm shadow-amber-200">
+                            class="flex-1 px-3 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold transition-colors shadow-sm shadow-amber-200 text-sm">
                             {{ __('New Order') }}
                         </button>
                     </div>
