@@ -129,8 +129,9 @@ class BakongProvider implements PaymentProvider
         // If Pending, fall through to the DB-based auto-confirm fallback.
         if (strlen($providerReference) === 32 && ctype_xdigit($providerReference)) {
             try {
+                $isSandbox = str_contains($this->baseUrl, 'sit-');
                 $bakongKHQR = new BakongKHQR($this->accessToken);
-                $result = $bakongKHQR->checkTransactionByMD5($providerReference, true);
+                $result = $bakongKHQR->checkTransactionByMD5($providerReference, $isSandbox);
 
                 $data = $result['data'] ?? $result;
 
@@ -189,12 +190,16 @@ class BakongProvider implements PaymentProvider
                         rawPayload: $data,
                     );
                 }
-            }
 
-            Log::warning('Bakong status check API error', [
-                'reference' => $providerReference,
-                'status' => $response->status(),
-            ]);
+                Log::info('Bakong status check returned pending', [
+                    'reference' => $providerReference,
+                ]);
+            } else {
+                Log::warning('Bakong status check API error', [
+                    'reference' => $providerReference,
+                    'status' => $response->status(),
+                ]);
+            }
         } catch (\Exception $e) {
             Log::warning('Bakong status check connection failed', [
                 'reference' => $providerReference,
