@@ -506,6 +506,8 @@ class PosTerminal extends Component
                 $this->showReceiptModal = true;
 
                 $this->dispatch('show-toast', message: 'Payment confirmed!', type: 'success');
+            } else {
+                $this->dispatch('show-toast', message: 'Waiting for customer to pay...', type: 'info');
             }
 
             $this->processing = false;

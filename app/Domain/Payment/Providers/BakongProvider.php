@@ -2,7 +2,6 @@
 
 namespace App\Domain\Payment\Providers;
 
-use App\Domain\Ordering\Models\Payment;
 use App\Domain\Payment\Contracts\PaymentProvider;
 use App\Domain\Payment\Data\PaymentQr;
 use App\Domain\Payment\Data\PaymentRequest;
@@ -111,7 +110,7 @@ class BakongProvider implements PaymentProvider
             $parts = explode('_', $providerReference);
             $createdAt = isset($parts[1]) ? (int) $parts[1] : 0;
             $elapsed = now()->diffInSeconds(now()->setTimestamp($createdAt));
-            $isReady = $createdAt > 0 && $elapsed >= 15;
+            $isReady = $createdAt > 0 && $elapsed >= 8;
 
             return new PaymentStatus(
                 status: $isReady ? PaymentStatusType::Paid : PaymentStatusType::Pending,
@@ -201,25 +200,6 @@ class BakongProvider implements PaymentProvider
                 'reference' => $providerReference,
                 'error' => $e->getMessage(),
             ]);
-        }
-
-        if (config('payment.khqr.static_qr_enabled', true)) {
-            $payment = Payment::where('provider_reference', $providerReference)
-                ->where('status', 'pending')
-                ->first();
-
-            if ($payment && $payment->created_at->diffInSeconds() >= 15) {
-                return new PaymentStatus(
-                    status: PaymentStatusType::Paid,
-                    providerReference: $providerReference,
-                    transactionReference: 'fallback_'.uniqid(),
-                    amount: (float) $payment->amount,
-                    currency: $payment->currency,
-                    message: 'Payment auto-confirmed (API unreachable)',
-                    paidAt: now(),
-                    rawPayload: ['fallback' => true, 'payment_id' => $payment->id],
-                );
-            }
         }
 
         return new PaymentStatus(

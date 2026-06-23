@@ -676,8 +676,8 @@
             }
         @endphp
         <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4"
-            x-data="{ pollInterval: null, timerInterval: null }"
-            x-init="clearInterval(pollInterval); pollInterval = setInterval(() => { $wire.checkKhqrStatus(); }, 3000)"
+            x-data="{ pollInterval: null, timerInterval: null, pollCount: 0, maxPolls: 120 }"
+            x-init="clearInterval(pollInterval); pollInterval = setInterval(() => { if (pollCount < maxPolls) { pollCount++; $wire.checkKhqrStatus(); } else { clearInterval(pollInterval); } }, 5000)"
             x-on:keydown.escape.window="clearInterval(pollInterval); clearInterval(timerInterval)"
             x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0"
@@ -727,20 +727,19 @@
                             class="flex-1 px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-2"
                             wire:loading.attr="disabled">
                             <svg wire:loading wire:target="checkKhqrStatus" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-                            <span wire:loading.remove wire:target="checkKhqrStatus">Check Payment</span>
-                            <span wire:loading wire:target="checkKhqrStatus">Checking...</span>
+                            <span wire:loading.remove wire:target="checkKhqrStatus">{{ __('Check Payment') }}</span>
+                            <span wire:loading wire:target="checkKhqrStatus">{{ __('Checking...') }}</span>
                         </button>
                         <button wire:click="generateKhqr"
                             class="flex-1 px-4 py-3 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl font-bold transition-colors"
                             wire:loading.attr="disabled"
                             x-on:click="clearInterval(pollInterval); clearInterval(timerInterval)">
-                            Refresh QR
+                            {{ __('Refresh QR') }}
                         </button>
                     </div>
 
                     <p class="text-xs text-stone-400 text-center mt-4">
-                        {{ __('Auto-checks every 3 seconds') }}
-                    </p>
+                        {{ __('Auto-confirms after payment') }}
                 </div>
             </div>
         </div>
