@@ -188,58 +188,69 @@
                             @endphp
                             <button wire:key="product-{{ $product['id'] }}"
                                 wire:click="addItemQuick({{ $product['id'] }})"
-                                class="group relative bg-white rounded-xl border border-stone-200 p-3 text-left transition-all duration-150
-                                    {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'hover:shadow-md hover:border-stone-300 active:scale-[0.97] cursor-pointer' }}"
+                                class="group relative bg-white rounded-xl border-2 p-4 text-left transition-all duration-150 flex flex-col
+                                    {{ $isOutOfStock
+                                        ? 'opacity-40 cursor-not-allowed border-stone-100'
+                                        : 'hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.97] cursor-pointer ' . ($hasOptions ? 'border-stone-200 hover:border-amber-300' : 'border-stone-200 hover:border-green-300') }}"
                             >
-                                <div class="relative mb-2.5">
+                                <div class="relative mb-3">
                                     @if($product['image'])
                                         <img src="{{ asset('storage/' . $product['image']) }}" alt="{{ $product['name'] }}"
-                                            class="w-full h-28 object-cover rounded-lg bg-stone-100">
+                                            class="w-full h-32 object-cover rounded-xl bg-stone-100">
                                     @else
-                                        <div class="w-full h-28 bg-stone-100 rounded-lg flex items-center justify-center">
-                                            <svg class="w-8 h-8 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        <div class="w-full h-32 bg-stone-100 rounded-xl flex items-center justify-center">
+                                            <svg class="w-10 h-10 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                         </div>
                                     @endif
                                     @if(!empty($product['tags']))
-                                        <div class="absolute top-1.5 left-1.5 flex flex-wrap gap-1">
+                                        <div class="absolute top-2 left-2 flex flex-wrap gap-1">
                                             @foreach((array) $product['tags'] as $tag)
                                                 @if($tag === 'new')
-                                                    <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-500 text-white shadow-sm">{{ __('NEW') }}</span>
+                                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500 text-white shadow-sm">{{ __('NEW') }}</span>
                                                 @elseif($tag === 'signature')
-                                                    <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-purple-500 text-white shadow-sm">{{ __('SIGNATURE') }}</span>
+                                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500 text-white shadow-sm">{{ __('SIGNATURE') }}</span>
                                                 @endif
                                             @endforeach
                                         </div>
                                     @endif
                                     @if($isOutOfStock)
-                                        <div class="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center">
-                                            <span class="text-white text-xs font-bold uppercase tracking-wider shadow-sm">{{ __('Sold Out') }}</span>
+                                        <div class="absolute inset-0 bg-black/40 rounded-xl flex items-center justify-center">
+                                            <span class="text-white text-sm font-bold uppercase tracking-wider shadow-sm">{{ __('Sold Out') }}</span>
+                                        </div>
+                                    @endif
+                                    @if(!$hasOptions && !$isOutOfStock)
+                                        <div class="absolute top-2 right-2 w-7 h-7 bg-green-500 text-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
                                         </div>
                                     @endif
                                 </div>
-                                <h3 class="font-semibold text-stone-800 text-sm leading-tight mb-1 line-clamp-2">{{ $product['name'] }}</h3>
-                                @if(!empty($product['calories']))
-                                    <p class="text-[10px] text-stone-400 mb-0.5">{{ $product['calories'] }} kcal</p>
-                                @endif
-                                @if(!empty($product['variants']))
-                                    @php
-                                        $activeVariants = collect($product['variants'])->where('is_active', true);
-                                        $minPrice = $product['price'] + ($activeVariants->min('price_adjustment') ?? 0);
-                                        $maxPrice = $product['price'] + ($activeVariants->max('price_adjustment') ?? 0);
-                                    @endphp
-                                    <p class="text-amber-600 font-bold text-sm">
-                                        ${{ number_format($minPrice, 2) }}@if($minPrice != $maxPrice) <span class="text-amber-400 font-normal">-{{ number_format($maxPrice, 2) }}</span>@endif
-                                    </p>
-                                @else
-                                    <p class="text-amber-600 font-bold text-sm">${{ number_format($product['price'], 2) }}</p>
-                                @endif
-                                <div class="flex items-center gap-1 mt-1.5">
-                                    @if($hasOptions)
-                                        <span class="text-[10px] font-medium bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">{{ __('Options') }}</span>
+                                <div class="flex-1 flex flex-col justify-between gap-1">
+                                    <h3 class="font-semibold text-stone-800 text-sm leading-snug line-clamp-2">{{ $product['name'] }}</h3>
+                                    @if(!empty($product['calories']))
+                                        <p class="text-[10px] text-stone-400">{{ $product['calories'] }} kcal</p>
                                     @endif
-                                    @if($isLowStock && !$isOutOfStock)
-                                        <span class="text-[10px] font-medium bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded">{{ $product['stock_quantity'] }} {{ __('left') }}</span>
+                                    @if(!empty($product['variants']))
+                                        @php
+                                            $activeVariants = collect($product['variants'])->where('is_active', true);
+                                            $minPrice = $product['price'] + ($activeVariants->min('price_adjustment') ?? 0);
+                                            $maxPrice = $product['price'] + ($activeVariants->max('price_adjustment') ?? 0);
+                                        @endphp
+                                        <p class="text-amber-600 font-bold text-sm mt-auto">
+                                            ${{ number_format($minPrice, 2) }}@if($minPrice != $maxPrice) <span class="text-amber-400 font-normal">-{{ number_format($maxPrice, 2) }}</span>@endif
+                                        </p>
+                                    @else
+                                        <p class="text-amber-600 font-bold text-base mt-auto">${{ number_format($product['price'], 2) }}</p>
                                     @endif
+                                    <div class="flex items-center gap-1 flex-wrap">
+                                        @if($hasOptions)
+                                            <span class="text-[10px] font-medium bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">{{ __('Options') }}</span>
+                                        @elseif(!$isOutOfStock)
+                                            <span class="text-[10px] font-medium bg-green-50 text-green-600 px-2 py-0.5 rounded-full">{{ __('Quick add') }}</span>
+                                        @endif
+                                        @if($isLowStock && !$isOutOfStock)
+                                            <span class="text-[10px] font-medium bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full">{{ $product['stock_quantity'] }} {{ __('left') }}</span>
+                                        @endif
+                                    </div>
                                 </div>
                             </button>
                         @endforeach

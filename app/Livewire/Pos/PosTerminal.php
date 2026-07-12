@@ -361,9 +361,25 @@ class PosTerminal extends Component
             return;
         }
 
+        $existingItem = $this->order->items()
+            ->where('product_id', $productId)
+            ->whereNull('product_variant_id')
+            ->whereNull('notes')
+            ->doesntHave('modifiers')
+            ->first();
+
+        if ($existingItem) {
+            $this->updateQuantity($existingItem->id, $existingItem->quantity + 1);
+            $this->dispatch('show-toast', message: $product->name.' x'.$existingItem->quantity, type: 'success');
+
+            return;
+        }
+
         app(AddOrderItemAction::class)->execute($this->order, $product);
 
         $this->order = $this->order->fresh();
+
+        $this->dispatch('show-toast', message: $product->name.' added', type: 'success');
     }
 
     public function removeItem(int $itemId): void
