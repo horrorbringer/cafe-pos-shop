@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Orders\Schemas;
 
 use App\Domain\Shared\Enums\OrderStatus;
 use App\Domain\Shared\Enums\OrderType;
+use App\Support\FeatureFlags;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -30,10 +31,11 @@ class OrderForm
 
                         Select::make('order_type')
                             ->label('Type')
-                            ->options(collect(OrderType::cases())->mapWithKeys(
-                                fn ($case) => [$case->value => $case->label()]
-                            ))
-                            ->default('dine_in')
+                            ->options(fn () => collect(OrderType::cases())
+                                ->filter(fn ($case) => FeatureFlags::tablesEnabled() || $case === OrderType::Takeaway)
+                                ->mapWithKeys(fn ($case) => [$case->value => $case->label()])
+                            )
+                            ->default(fn () => FeatureFlags::tablesEnabled() ? 'dine_in' : 'takeaway')
                             ->required()
                             ->native(false),
 
@@ -49,7 +51,8 @@ class OrderForm
                         TextInput::make('table_number')
                             ->label('Table #')
                             ->placeholder('--')
-                            ->numeric(),
+                            ->numeric()
+                            ->visible(fn () => FeatureFlags::tablesEnabled()),
                     ]),
 
                 Section::make('Payment')

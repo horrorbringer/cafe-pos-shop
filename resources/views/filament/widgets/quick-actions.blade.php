@@ -1,5 +1,5 @@
 <x-filament-widgets::widget>
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <a href="{{ route('pos') }}"
             class="flex items-center gap-3 px-4 py-3 rounded-xl bg-white dark:bg-gray-800 ring-1 ring-gray-950/5 dark:ring-white/10 hover:ring-primary-500/30 transition-all hover:shadow-sm">
             <div class="w-10 h-10 rounded-lg bg-primary-50 dark:bg-primary-500/10 flex items-center justify-center shrink-0">
@@ -32,6 +32,30 @@
                 <p class="text-xs text-gray-400 truncate">{{ __('Manage catalog') }}</p>
             </div>
         </a>
+
+        <a href="{{ \App\Filament\Resources\Products\ProductResource::getUrl('create') }}"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl bg-white dark:bg-gray-800 ring-1 ring-gray-950/5 dark:ring-white/10 hover:ring-emerald-500/30 transition-all hover:shadow-sm">
+            <div class="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center shrink-0">
+                <x-filament::icon icon="heroicon-o-plus-circle" class="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div class="min-w-0">
+                <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ __('Add Product') }}</p>
+                <p class="text-xs text-gray-400 truncate">{{ __('New menu item') }}</p>
+            </div>
+        </a>
+
+        @if (\App\Support\FeatureFlags::inventoryEnabled())
+            <a href="{{ \App\Filament\Resources\InventoryItems\InventoryItemResource::getUrl('create') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl bg-white dark:bg-gray-800 ring-1 ring-gray-950/5 dark:ring-white/10 hover:ring-sky-500/30 transition-all hover:shadow-sm">
+                <div class="w-10 h-10 rounded-lg bg-sky-50 dark:bg-sky-500/10 flex items-center justify-center shrink-0">
+                    <x-filament::icon icon="heroicon-o-archive-box-arrow-down" class="w-5 h-5 text-sky-600 dark:text-sky-400" />
+                </div>
+                <div class="min-w-0">
+                    <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ __('Add Stock') }}</p>
+                    <p class="text-xs text-gray-400 truncate">{{ __('New inventory item') }}</p>
+                </div>
+            </a>
+        @endif
 
         <a href="{{ \App\Filament\Pages\ReportsPage::getUrl() }}"
             class="flex items-center gap-3 px-4 py-3 rounded-xl bg-white dark:bg-gray-800 ring-1 ring-gray-950/5 dark:ring-white/10 hover:ring-violet-500/30 transition-all hover:shadow-sm">

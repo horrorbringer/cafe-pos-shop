@@ -21,10 +21,11 @@ class SalesChart extends ChartWidget
 
     protected function getData(): array
     {
-        $days = match ($this->filter) {
-            'month' => 30,
-            'week' => 7,
-            default => 7,
+        [$days, $format] = match ($this->filter) {
+            'year' => [12, 'M'],
+            'month' => [30, 'M d'],
+            'week' => [7, 'D'],
+            default => [7, 'D'],
         };
 
         $labels = collect();
@@ -32,19 +33,37 @@ class SalesChart extends ChartWidget
         $orders = collect();
 
         for ($i = $days - 1; $i >= 0; $i--) {
-            $date = Carbon::today()->subDays($i);
-            $labels->push($date->format($days > 7 ? 'M d' : 'D'));
+            if ($this->filter === 'year') {
+                $date = Carbon::today()->subMonths($i);
+                $startOfMonth = (clone $date)->startOfMonth();
+                $endOfMonth = (clone $date)->endOfMonth();
+                $labels->push($date->format('M'));
 
-            $daySales = Order::whereDate('created_at', $date)
-                ->whereIn('status', [OrderStatus::Paid, OrderStatus::Completed])
-                ->sum('total');
+                $monthSales = Order::whereBetween('created_at', [$startOfMonth, $endOfMonth])
+                    ->whereIn('status', [OrderStatus::Paid, OrderStatus::Completed])
+                    ->sum('total');
 
-            $dayOrders = Order::whereDate('created_at', $date)
-                ->whereIn('status', [OrderStatus::Paid, OrderStatus::Completed])
-                ->count();
+                $monthOrders = Order::whereBetween('created_at', [$startOfMonth, $endOfMonth])
+                    ->whereIn('status', [OrderStatus::Paid, OrderStatus::Completed])
+                    ->count();
 
-            $sales->push(round($daySales, 2));
-            $orders->push($dayOrders);
+                $sales->push(round($monthSales, 2));
+                $orders->push($monthOrders);
+            } else {
+                $date = Carbon::today()->subDays($i);
+                $labels->push($date->format($format));
+
+                $daySales = Order::whereDate('created_at', $date)
+                    ->whereIn('status', [OrderStatus::Paid, OrderStatus::Completed])
+                    ->sum('total');
+
+                $dayOrders = Order::whereDate('created_at', $date)
+                    ->whereIn('status', [OrderStatus::Paid, OrderStatus::Completed])
+                    ->count();
+
+                $sales->push(round($daySales, 2));
+                $orders->push($dayOrders);
+            }
         }
 
         return [
@@ -85,6 +104,7 @@ class SalesChart extends ChartWidget
         return [
             'week' => 'This Week',
             'month' => 'This Month',
+            'year' => 'This Year',
         ];
     }
 
@@ -134,6 +154,7 @@ class SalesChart extends ChartWidget
     public function getHeading(): ?string
     {
         return match ($this->filter) {
+            'year' => '12-Month Sales',
             'month' => '30-Day Sales',
             default => '7-Day Sales',
         };

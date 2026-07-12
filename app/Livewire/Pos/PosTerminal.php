@@ -15,6 +15,7 @@ use App\Domain\Ordering\Models\Order;
 use App\Domain\Payment\PaymentManager;
 use App\Domain\Shared\Enums\OrderStatus;
 use App\Services\ReceiptPrinterService;
+use App\Support\FeatureFlags;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -188,7 +189,7 @@ class PosTerminal extends Component
     #[Computed]
     public function itemCount(): int
     {
-        return $this->order?->items()->sum('quantity') ?? 0;
+        return $this->order?->items->sum('quantity') ?? 0;
     }
 
     #[Computed]
@@ -243,7 +244,7 @@ class PosTerminal extends Component
     {
         $product = Product::with(['variants', 'modifierGroups.options'])->findOrFail($productId);
 
-        if ($product->stock_quantity <= 0) {
+        if (FeatureFlags::inventoryEnabled() && $product->stock_quantity <= 0) {
             $this->dispatch('show-toast', message: __('Product is out of stock'), type: 'error');
 
             return;
@@ -348,7 +349,7 @@ class PosTerminal extends Component
     {
         $product = Product::with(['variants', 'modifierGroups.options'])->findOrFail($productId);
 
-        if ($product->stock_quantity <= 0) {
+        if (FeatureFlags::inventoryEnabled() && $product->stock_quantity <= 0) {
             $this->dispatch('show-toast', message: __('Product is out of stock'), type: 'error');
 
             return;
@@ -401,7 +402,7 @@ class PosTerminal extends Component
 
     public function applyDiscountPercent(int $percent): void
     {
-        $subtotal = $this->order->items->sum('total_price');
+        $subtotal = $this->order->items()->sum('total_price');
         $discount = round($subtotal * ($percent / 100), 2);
 
         $this->applyDiscount($discount);

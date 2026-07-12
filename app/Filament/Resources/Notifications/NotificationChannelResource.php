@@ -8,6 +8,7 @@ use App\Filament\Resources\Notifications\Pages\EditNotificationChannel;
 use App\Filament\Resources\Notifications\Pages\ListNotificationChannels;
 use App\Filament\Resources\Notifications\Schemas\NotificationChannelForm;
 use App\Filament\Resources\Notifications\Tables\NotificationChannelsTable;
+use App\Support\FeatureFlags;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -22,13 +23,16 @@ class NotificationChannelResource extends Resource
 
     protected static ?int $navigationSort = 10;
 
-    protected static bool $shouldRegisterNavigation = true;
-
     protected static ?string $navigationLabel = 'Channels';
 
     protected static ?string $modelLabel = 'Channel';
 
     protected static ?string $pluralModelLabel = 'Notification Channels';
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return FeatureFlags::notificationsEnabled();
+    }
 
     public static function getNavigationGroup(): ?string
     {

@@ -8,6 +8,7 @@ use App\Filament\Resources\Branches\Pages\ListBranches;
 use App\Filament\Resources\Branches\Schemas\BranchForm;
 use App\Filament\Resources\Branches\Tables\BranchesTable;
 use App\Models\Branch;
+use App\Support\FeatureFlags;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -20,9 +21,12 @@ class BranchResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingStorefront;
 
-    protected static bool $shouldRegisterNavigation = true;
-
     protected static ?int $navigationSort = 5;
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return FeatureFlags::branchesEnabled();
+    }
 
     public static function canAccess(): bool
     {

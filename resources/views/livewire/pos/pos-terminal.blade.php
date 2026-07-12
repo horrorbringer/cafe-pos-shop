@@ -24,13 +24,42 @@
             </div>
 
             <div class="flex items-center gap-2 ml-auto">
-                <x-language-switcher />
+                <button onclick="window.open('{{ route('pos.customer-display') }}', 'customer-display', 'width=800,height=600')"
+                    class="text-xs text-stone-400 hover:text-stone-600 hover:bg-stone-100 px-2 py-1 rounded transition-colors flex items-center gap-1"
+                    title="{{ __('Open customer display') }}">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                    {{ __('Display') }}
+                </button>
+                @if($this->itemCount > 0)
+                    <button wire:click="holdOrder"
+                        class="text-xs text-stone-500 hover:text-amber-600 hover:bg-amber-50 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        {{ __('Hold') }}
+                    </button>
+                @endif
+                @php $heldCount = count($this->suspendedOrders); @endphp
+                @if($heldCount > 0)
+                    <button wire:click="$toggle('showSuspendedOrders')"
+                        class="relative text-xs text-stone-500 hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                        </svg>
+                        {{ __('Held') }}
+                        <span class="bg-blue-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full -mr-1">{{ $heldCount }}</span>
+                    </button>
+                @endif
                 @if($this->itemCount > 0)
                     <button wire:click="cancelOrder"
                         class="text-xs text-stone-400 hover:text-red-500 hover:bg-red-50 px-2 py-1 rounded transition-colors">
                         {{ __('Clear') }}
                     </button>
                 @endif
+                <x-language-switcher />
             </div>
         </div>
 
@@ -54,7 +83,7 @@
                 @foreach($this->categories as $category)
                     @php $catCount = $categoryCounts->get($category['id'], 0); @endphp
                     @if($catCount > 0 || $selectedCategoryId === $category['id'])
-                    <button wire:click="$set('selectedCategoryId', {{ $category['id'] }})"
+                    <button wire:key="cat-{{ $category['id'] }}" wire:click="$set('selectedCategoryId', {{ $category['id'] }})"
                         class="px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1.5 {{ $selectedCategoryId === $category['id'] ? 'bg-stone-800 text-white' : 'bg-stone-100 text-stone-600 hover:bg-stone-200' }}">
                         {{ $category['name'] }}
                         <span class="text-[10px] font-bold px-1.5 py-0.5 rounded {{ $selectedCategoryId === $category['id'] ? 'bg-white/20' : 'bg-stone-200 text-stone-500' }}">{{ $catCount }}</span>
@@ -109,7 +138,7 @@
                             @php
                                 $isOutOfStock = $product['stock_quantity'] <= 0;
                             @endphp
-                            <button
+                            <button wire:key="popular-{{ $product['id'] }}"
                                 wire:click="addItemQuick({{ $product['id'] }})"
                                 class="group relative bg-white rounded-xl border border-amber-200 p-2.5 text-left transition-all duration-150 cursor-pointer
                                     {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'hover:shadow-md hover:border-amber-300 active:scale-[0.97]' }}"
@@ -122,7 +151,6 @@
                                             <svg class="w-5 h-5 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                         </div>
                                     @endif
-                                    {{-- Quick-add overlay on hover --}}
                                     <div class="absolute inset-0 rounded-lg bg-amber-500/0 group-hover:bg-amber-500/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
                                         <span class="bg-amber-500 text-white text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center shadow-sm">+</span>
                                     </div>
@@ -158,7 +186,7 @@
                                 $isLowStock = $product['stock_quantity'] > 0 && $product['stock_quantity'] <= 5;
                                 $hasOptions = !empty($product['variants']) || !empty($product['modifier_groups']);
                             @endphp
-                            <button
+                            <button wire:key="product-{{ $product['id'] }}"
                                 wire:click="addItemQuick({{ $product['id'] }})"
                                 class="group relative bg-white rounded-xl border border-stone-200 p-3 text-left transition-all duration-150
                                     {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'hover:shadow-md hover:border-stone-300 active:scale-[0.97] cursor-pointer' }}"
@@ -262,7 +290,7 @@
             @else
                 <div class="divide-y divide-stone-100">
                     @foreach($this->cartItems as $item)
-                        <div class="px-5 py-3 hover:bg-stone-50 transition-colors">
+                        <div wire:key="cart-{{ $item['id'] }}" class="px-5 py-3 hover:bg-stone-50 transition-colors">
                             <div class="flex items-start gap-3">
                                 {{-- Item Info --}}
                                 <div class="flex-1 min-w-0">
@@ -384,6 +412,58 @@
         @endif
     </div>
 
+    {{-- Suspended Orders Panel --}}
+    @if($showSuspendedOrders && count($this->suspendedOrders) > 0)
+        <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            wire:key="suspended-orders-panel">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-y-auto"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 scale-95"
+                x-transition:enter-end="opacity-100 scale-100">
+                <div class="p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-base font-bold text-stone-800">{{ __('Held Orders') }}</h3>
+                        <button wire:click="$set('showSuspendedOrders', false)"
+                            class="w-7 h-7 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center transition-colors">
+                            <svg class="w-3.5 h-3.5 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="space-y-2">
+                        @foreach($this->suspendedOrders as $held)
+                            <button wire:click="resumeOrder({{ $held['id'] }})"
+                                wire:key="held-{{ $held['id'] }}"
+                                class="w-full text-left p-3.5 rounded-xl border border-stone-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center justify-between group">
+                                <div>
+                                    <p class="font-semibold text-stone-800 text-sm">{{ $held['order_number'] ?? '#' . $held['id'] }}</p>
+                                    <p class="text-xs text-stone-400 mt-0.5">
+                                        {{ $held['items_count'] ?? 0 }} {{ __('items') }}
+                                        &middot; {{ \Carbon\Carbon::parse($held['updated_at'])->diffForHumans() }}
+                                    </p>
+                                </div>
+                                <div class="text-blue-500 group-hover:translate-x-0.5 transition-transform">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </div>
+                            </button>
+                        @endforeach
+                    </div>
+                    @if(count($this->suspendedOrders) === 0)
+                        <p class="text-center text-stone-400 py-6 text-sm">{{ __('No held orders') }}</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @endif
+
     {{-- Modifier Modal --}}
     @if($showModifierModal && $selectedProduct)
         <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4"
@@ -419,7 +499,7 @@
                                 <label class="block text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2">{{ __('Size') }}</label>
                                 <div class="grid grid-cols-3 gap-2">
                                     @foreach($activeVariants as $variant)
-                                        <button
+                                        <button wire:key="variant-{{ $variant['id'] }}"
                                             wire:click="selectVariant({{ $variant['id'] }})"
                                             class="py-2.5 px-3 rounded-xl border-2 text-sm font-medium transition-all
                                                 {{ $selectedVariant && $selectedVariant['id'] == $variant['id']
@@ -457,7 +537,7 @@
                                             @php
                                                 $isSelected = collect($selectedModifiers)->contains('modifier_option_id', $option['id']);
                                             @endphp
-                                            <button
+                                            <button wire:key="mod-{{ $option['id'] }}"
                                                 wire:click="toggleModifier({{ $option['id'] }})"
                                                 class="py-2 px-3.5 rounded-xl border-2 text-sm font-medium transition-all
                                                     {{ $isSelected
@@ -492,7 +572,7 @@
                             </div>
                             <div class="flex gap-1.5">
                                 @foreach([1, 2, 3, 4, 5] as $qty)
-                                    <button wire:click="$set('itemQuantity', {{ $qty }})"
+                                    <button wire:key="qty-{{ $qty }}" wire:click="$set('itemQuantity', {{ $qty }})"
                                         class="w-10 h-12 rounded-xl text-sm font-bold transition-all
                                             {{ $this->itemQuantity === $qty
                                                 ? 'bg-amber-500 text-white shadow-sm'
@@ -606,7 +686,7 @@
                             <div class="grid grid-cols-4 gap-2">
                                 @php $denominations = config('pos.cash_denominations', [1, 2, 5, 10, 20, 50, 100]); @endphp
                                 @foreach($denominations as $amount)
-                                    <button wire:click="$set('amountTendered', {{ $amount }})"
+                                    <button wire:key="cash-{{ $amount }}" wire:click="$set('amountTendered', {{ $amount }})"
                                         class="py-2 rounded-lg text-sm font-semibold transition-colors
                                             {{ $amountTendered == $amount
                                                 ? 'ring-2 ring-amber-500 bg-amber-50 text-amber-700'

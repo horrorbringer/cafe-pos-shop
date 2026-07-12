@@ -6,6 +6,7 @@ use App\Domain\Ordering\Models\Order;
 use App\Domain\Ordering\Models\Payment;
 use App\Domain\Shared\Enums\OrderStatus;
 use App\Domain\Shared\Enums\PaymentMethod;
+use App\Filament\Resources\Orders\OrderResource;
 use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -19,15 +20,16 @@ class DailySales extends StatsOverviewWidget
         $today = Carbon::today();
         $yesterday = Carbon::yesterday();
         $startOfWeek = Carbon::now()->startOfWeek();
+        $startOfMonth = Carbon::now()->startOfMonth();
 
-        $orders = Order::whereDate('created_at', $today)
+        $todayOrders = Order::whereDate('created_at', $today)
             ->whereIn('status', [OrderStatus::Paid, OrderStatus::Completed]);
 
-        $totalSales = (clone $orders)->sum('total');
-        $totalOrders = (clone $orders)->count();
+        $totalSales = (clone $todayOrders)->sum('total');
+        $totalOrders = (clone $todayOrders)->count();
         $averageOrderValue = $totalOrders > 0 ? $totalSales / $totalOrders : 0;
 
-        $saleIds = (clone $orders)->pluck('id');
+        $saleIds = (clone $todayOrders)->pluck('id');
 
         $cashTotal = Payment::whereIn('order_id', $saleIds)
             ->where('method', PaymentMethod::Cash)
@@ -52,8 +54,17 @@ class DailySales extends StatsOverviewWidget
             ->whereIn('status', [OrderStatus::Paid, OrderStatus::Completed])
             ->sum('total');
 
-        $completedOrders = (clone $orders)->where('status', OrderStatus::Completed)->count();
+        $completedOrders = (clone $todayOrders)->where('status', OrderStatus::Completed)->count();
         $completionRate = $totalOrders > 0 ? round(($completedOrders / $totalOrders) * 100, 1) : 0;
+
+        $pendingOrders = Order::whereDate('created_at', $today)
+            ->where('status', OrderStatus::Pending)
+            ->count();
+
+        $monthSales = Order::whereDate('created_at', '>=', $startOfMonth)
+            ->whereDate('created_at', '<=', $today)
+            ->whereIn('status', [OrderStatus::Paid, OrderStatus::Completed])
+            ->sum('total');
 
         return [
             Stat::make('Today\'s Sales', '$'.number_format($totalSales, 2))
@@ -64,17 +75,35 @@ class DailySales extends StatsOverviewWidget
                     ? 'heroicon-m-arrow-trending-up'
                     : 'heroicon-m-arrow-trending-down')
                 ->color($salesTrend >= 0 ? 'success' : 'danger')
-                ->chart($this->getHourlyTrend()),
+                ->chart($this->getHourlyTrend())
+                ->url(OrderResource::getUrl('index', [
+                    'tableFilters' => [
+                        'order_date' => [
+                            'date' => $today->format('Y-m-d'),
+                        ],
+                    ],
+                ])),
 
             Stat::make('Week to Date', '$'.number_format($weekSales, 2))
-                ->description('Since '.$startOfWeek->format('D M d'))
+                ->description(number_format($monthSales, 2).' this month')
                 ->descriptionIcon('heroicon-m-calendar-days')
                 ->color('info'),
 
             Stat::make('Orders', $totalOrders)
                 ->description(number_format($completionRate, 1).'% completed')
                 ->descriptionIcon('heroicon-m-shopping-bag')
-                ->color('primary'),
+                ->color('primary')
+                ->url(OrderResource::getUrl('index')),
+
+            Stat::make('Pending', $pendingOrders)
+                ->description('Awaiting fulfillment')
+                ->descriptionIcon('heroicon-m-clock')
+                ->color($pendingOrders > 0 ? 'warning' : 'gray')
+                ->url(OrderResource::getUrl('index', [
+                    'tableFilters' => [
+                        'status' => ['value' => OrderStatus::Pending->value],
+                    ],
+                ])),
 
             Stat::make('Avg Order', '$'.number_format($averageOrderValue, 2))
                 ->description($totalOrders.' transactions today')

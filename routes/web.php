@@ -39,4 +39,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/pos/orders', function () {
         return view('pos.orders');
     })->name('pos.orders');
+
+    Route::get('/pos/customer-display', function () {
+        return view('pos.customer-display');
+    })->name('pos.customer-display');
 });

@@ -8,6 +8,7 @@ use App\Filament\Resources\InventoryItems\Pages\ListInventoryItems;
 use App\Filament\Resources\InventoryItems\Schemas\InventoryItemForm;
 use App\Filament\Resources\InventoryItems\Tables\InventoryItemsTable;
 use App\Models\InventoryItem;
+use App\Support\FeatureFlags;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -22,9 +23,14 @@ class InventoryItemResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return FeatureFlags::inventoryEnabled();
+    }
+
     public static function canAccess(): bool
     {
-        return auth()->user()?->hasAnyRole(['admin', 'manager']) ?? false;
+        return FeatureFlags::inventoryEnabled() && (auth()->user()?->hasAnyRole(['admin', 'manager']) ?? false);
     }
 
     public static function getNavigationGroup(): ?string

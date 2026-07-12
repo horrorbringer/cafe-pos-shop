@@ -11,10 +11,6 @@ use App\Models\Product;
 use BackedEnum;
 use Filament\Actions\CreateAction;
 use Filament\Pages\Page;
-use Filament\Schemas\Components\EmbeddedTable;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
-use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
 use Filament\Tables\Contracts\HasTable;
@@ -39,16 +35,6 @@ class MenuManagement extends Page implements HasTable
         return auth()->user()?->hasAnyRole(['admin', 'manager']) ?? false;
     }
 
-    public function mount(): void
-    {
-        $this->authorizeAccess();
-    }
-
-    protected function authorizeAccess(): void
-    {
-        //
-    }
-
     public function getTitle(): string
     {
         return __('Menu Management');
@@ -66,10 +52,7 @@ class MenuManagement extends Page implements HasTable
 
     public function table(Table $table): Table
     {
-        $tab = match (strtolower($this->activeTab ?? '')) {
-            'categories' => 'categories',
-            default => 'products',
-        };
+        $tab = strtolower($this->activeTab ?? '') === 'categories' ? 'categories' : 'products';
 
         return match ($tab) {
             'categories' => CategoriesTable::configure($table->query(Category::query())),
@@ -84,33 +67,20 @@ class MenuManagement extends Page implements HasTable
                 ->label('Add Product')
                 ->icon(Heroicon::OutlinedPlus)
                 ->url(ProductResource::getUrl('create'))
-                ->openUrlInNewTab(),
+                ->openUrlInNewTab()
+                ->visible(fn () => $this->activeTab !== 'categories'),
 
             CreateAction::make('addCategory')
                 ->label('Add Category')
                 ->icon(Heroicon::OutlinedPlus)
                 ->url(CategoryResource::getUrl('create'))
-                ->openUrlInNewTab(),
+                ->openUrlInNewTab()
+                ->visible(fn () => $this->activeTab === 'categories'),
         ];
     }
 
-    public function content(Schema $schema): Schema
+    public function switchTab(string $tab): void
     {
-        return $schema
-            ->components([
-                Tabs::make()
-                    ->key('menuTabs')
-                    ->livewireProperty('activeTab')
-                    ->contained(false)
-                    ->tabs([
-                        Tab::make('Products')
-                            ->icon(Heroicon::OutlinedCube)
-                            ->badge(fn (): int => Product::count()),
-                        Tab::make('Categories')
-                            ->icon(Heroicon::OutlinedRectangleStack)
-                            ->badge(fn (): int => Category::count()),
-                    ]),
-                EmbeddedTable::make(),
-            ]);
+        $this->activeTab = $tab;
     }
 }

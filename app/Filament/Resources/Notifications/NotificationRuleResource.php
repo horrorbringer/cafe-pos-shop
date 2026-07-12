@@ -8,6 +8,7 @@ use App\Filament\Resources\Notifications\Pages\EditNotificationRule;
 use App\Filament\Resources\Notifications\Pages\ListNotificationRules;
 use App\Filament\Resources\Notifications\Schemas\NotificationRuleForm;
 use App\Filament\Resources\Notifications\Tables\NotificationRulesTable;
+use App\Support\FeatureFlags;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -22,13 +23,16 @@ class NotificationRuleResource extends Resource
 
     protected static ?int $navigationSort = 12;
 
-    protected static bool $shouldRegisterNavigation = true;
-
     protected static ?string $navigationLabel = 'Rules';
 
     protected static ?string $modelLabel = 'Notification Rule';
 
     protected static ?string $pluralModelLabel = 'Notification Rules';
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return FeatureFlags::notificationsEnabled();
+    }
 
     public static function getNavigationGroup(): ?string
     {

@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Orders\Tables;
 use App\Domain\Shared\Enums\OrderStatus;
 use App\Domain\Shared\Enums\OrderType;
 use App\Domain\Shared\Enums\PaymentMethod;
+use App\Support\FeatureFlags;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -19,8 +20,11 @@ class OrdersTable
 {
     public static function configure(Table $table): Table
     {
+        $withTables = FeatureFlags::tablesEnabled();
+
         return $table
-            ->columns([
+            ->modifyQueryUsing(fn (Builder $query) => $query->with(['user', 'payments']))
+            ->columns(array_filter([
                 TextColumn::make('order_number')
                     ->label('Order')
                     ->searchable()
@@ -33,26 +37,30 @@ class OrdersTable
                     ->sortable()
                     ->description(fn ($record) => $record->created_at->diffForHumans()),
 
-                TextColumn::make('order_type')
-                    ->label('')
-                    ->formatStateUsing(fn (OrderType $state): string => $state->label())
-                    ->badge()
-                    ->color(fn (OrderType $state): string => match ($state) {
-                        OrderType::DineIn => 'info',
-                        OrderType::Takeaway => 'warning',
-                        OrderType::Delivery => 'success',
-                    })
-                    ->icon(fn (OrderType $state): string => match ($state) {
-                        OrderType::DineIn => 'heroicon-m-building-storefront',
-                        OrderType::Takeaway => 'heroicon-m-shopping-bag',
-                        OrderType::Delivery => 'heroicon-m-truck',
-                    }),
+                $withTables
+                    ? TextColumn::make('order_type')
+                        ->label('')
+                        ->formatStateUsing(fn (OrderType $state): string => $state->label())
+                        ->badge()
+                        ->color(fn (OrderType $state): string => match ($state) {
+                            OrderType::DineIn => 'info',
+                            OrderType::Takeaway => 'warning',
+                            OrderType::Delivery => 'success',
+                        })
+                        ->icon(fn (OrderType $state): string => match ($state) {
+                            OrderType::DineIn => 'heroicon-m-building-storefront',
+                            OrderType::Takeaway => 'heroicon-m-shopping-bag',
+                            OrderType::Delivery => 'heroicon-m-truck',
+                        })
+                    : null,
 
-                TextColumn::make('table_number')
-                    ->label('Table')
-                    ->badge()
-                    ->color('gray')
-                    ->visible(fn ($state) => filled($state)),
+                $withTables
+                    ? TextColumn::make('table_number')
+                        ->label('Table')
+                        ->badge()
+                        ->color('gray')
+                        ->visible(fn ($state) => filled($state))
+                    : null,
 
                 TextColumn::make('user.name')
                     ->label('Cashier')
@@ -96,9 +104,9 @@ class OrdersTable
                         OrderStatus::Refunded => 'heroicon-m-arrow-uturn-left',
                         default => 'heroicon-m-document',
                     }),
-            ])
+            ]))
             ->defaultSort('created_at', 'desc')
-            ->filters([
+            ->filters(array_filter([
                 SelectFilter::make('status')
                     ->options([
                         'draft' => 'Draft',
@@ -116,15 +124,17 @@ class OrdersTable
                     ->label('Today')
                     ->default(),
 
-                SelectFilter::make('order_type')
-                    ->label('Type')
-                    ->options([
-                        'dine_in' => 'Dine-in',
-                        'takeaway' => 'Takeaway',
-                        'delivery' => 'Delivery',
-                    ])
-                    ->native(false),
-            ])
+                $withTables
+                    ? SelectFilter::make('order_type')
+                        ->label('Type')
+                        ->options([
+                            'dine_in' => 'Dine-in',
+                            'takeaway' => 'Takeaway',
+                            'delivery' => 'Delivery',
+                        ])
+                        ->native(false)
+                    : null,
+            ]))
             ->recordActions([
                 EditAction::make()
                     ->label('View')

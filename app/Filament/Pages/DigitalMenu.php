@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Domain\Shop\Models\Setting;
 use App\Services\QrCodeService;
+use App\Support\FeatureFlags;
 use BackedEnum;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
@@ -63,9 +64,14 @@ class DigitalMenu extends Page
 
     public ?string $socialTwitter = null;
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return FeatureFlags::digitalMenuEnabled();
+    }
+
     public static function canAccess(): bool
     {
-        return auth()->user()?->hasAnyRole(['admin', 'manager']) ?? false;
+        return FeatureFlags::digitalMenuEnabled() && (auth()->user()?->hasAnyRole(['admin', 'manager']) ?? false);
     }
 
     public static function getNavigationIcon(): string|BackedEnum|Htmlable|null

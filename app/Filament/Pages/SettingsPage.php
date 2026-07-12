@@ -95,6 +95,20 @@ class SettingsPage extends Page
 
     public bool $receiptShowNotes = true;
 
+    public bool $inventoryEnabled = false;
+
+    public bool $branchesEnabled = false;
+
+    public bool $modifierGroupsEnabled = false;
+
+    public bool $variantsEnabled = false;
+
+    public bool $tablesEnabled = false;
+
+    public bool $digitalMenuEnabled = false;
+
+    public bool $notificationsEnabled = false;
+
     public static function canAccess(): bool
     {
         return auth()->user()?->hasRole('admin') ?? false;
@@ -131,6 +145,14 @@ class SettingsPage extends Page
         $this->receiptShowDiscount = Setting::getValue('receipt_show_discount', true);
         $this->receiptShowPayment = Setting::getValue('receipt_show_payment', true);
         $this->receiptShowNotes = Setting::getValue('receipt_show_notes', true);
+
+        $this->inventoryEnabled = Setting::getValue('inventory_enabled', false);
+        $this->branchesEnabled = Setting::getValue('branches_enabled', false);
+        $this->modifierGroupsEnabled = Setting::getValue('modifier_groups_enabled', false);
+        $this->variantsEnabled = Setting::getValue('variants_enabled', false);
+        $this->tablesEnabled = Setting::getValue('tables_enabled', false);
+        $this->digitalMenuEnabled = Setting::getValue('digital_menu_enabled', false);
+        $this->notificationsEnabled = Setting::getValue('notifications_enabled', false);
     }
 
     public function content(Schema $schema): Schema
@@ -288,6 +310,45 @@ class SettingsPage extends Page
                                                 ->size('lg')
                                                 ->link(),
                                         ]),
+                                    ]),
+                            ]),
+
+                        Tab::make('Features')
+                            ->icon(Heroicon::OutlinedCog8Tooth)
+                            ->schema([
+                                Section::make('Feature Toggles')
+                                    ->icon(Heroicon::OutlinedCog8Tooth)
+                                    ->description('Enable or disable advanced features. Turning off a feature hides its navigation and widgets but preserves existing data.')
+                                    ->columns(2)
+                                    ->schema([
+                                        Toggle::make('inventoryEnabled')
+                                            ->label('Inventory Management')
+                                            ->helperText('Track stock levels, movement history, and low-stock alerts.')
+                                            ->default(false),
+
+                                        Toggle::make('branchesEnabled')
+                                            ->label('Multi-Branch Management')
+                                            ->helperText('Manage multiple cafe locations with branch-specific products, orders, and inventory.'),
+
+                                        Toggle::make('modifierGroupsEnabled')
+                                            ->label('Modifier Groups')
+                                            ->helperText('Extra options like Sugar Level, Ice Level, or Toppings.'),
+
+                                        Toggle::make('variantsEnabled')
+                                            ->label('Product Variants')
+                                            ->helperText('Size options (Small, Medium, Large) with price adjustments.'),
+
+                                        Toggle::make('tablesEnabled')
+                                            ->label('Dine-in Tables')
+                                            ->helperText('Table numbers, dine-in/takeaway/delivery order types.'),
+
+                                        Toggle::make('digitalMenuEnabled')
+                                            ->label('Digital Menu')
+                                            ->helperText('QR code menu for customers to browse and order from their phone.'),
+
+                                        Toggle::make('notificationsEnabled')
+                                            ->label('Notifications')
+                                            ->helperText('Email and Telegram alerts for new orders and events.'),
                                     ]),
                             ]),
 
@@ -551,6 +612,14 @@ class SettingsPage extends Page
         Setting::setValue('receipt_show_discount', $state['receiptShowDiscount'] ? '1' : '0', 'boolean');
         Setting::setValue('receipt_show_payment', $state['receiptShowPayment'] ? '1' : '0', 'boolean');
         Setting::setValue('receipt_show_notes', $state['receiptShowNotes'] ? '1' : '0', 'boolean');
+
+        Setting::setValue('inventory_enabled', $state['inventoryEnabled'] ? '1' : '0', 'boolean');
+        Setting::setValue('branches_enabled', $state['branchesEnabled'] ? '1' : '0', 'boolean');
+        Setting::setValue('modifier_groups_enabled', $state['modifierGroupsEnabled'] ? '1' : '0', 'boolean');
+        Setting::setValue('variants_enabled', $state['variantsEnabled'] ? '1' : '0', 'boolean');
+        Setting::setValue('tables_enabled', $state['tablesEnabled'] ? '1' : '0', 'boolean');
+        Setting::setValue('digital_menu_enabled', $state['digitalMenuEnabled'] ? '1' : '0', 'boolean');
+        Setting::setValue('notifications_enabled', $state['notificationsEnabled'] ? '1' : '0', 'boolean');
 
         Notification::make()
             ->success()

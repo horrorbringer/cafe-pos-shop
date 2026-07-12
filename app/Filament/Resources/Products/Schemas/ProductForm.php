@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Products\Schemas;
 
+use App\Support\FeatureFlags;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
@@ -118,6 +119,7 @@ class ProductForm
                 Section::make('Inventory')
                     ->icon(Heroicon::OutlinedArchiveBox)
                     ->columns(2)
+                    ->visible(fn () => FeatureFlags::inventoryEnabled())
                     ->schema([
                         TextInput::make('stock_quantity')
                             ->label('Stock Quantity')
@@ -136,6 +138,7 @@ class ProductForm
                     ->icon(Heroicon::OutlinedQueueList)
                     ->description('Size options (Small, Medium, Large) with price adjustments.')
                     ->collapsible()
+                    ->visible(fn () => FeatureFlags::variantsEnabled())
                     ->schema([
                         Repeater::make('variants')
                             ->relationship()
@@ -173,6 +176,7 @@ class ProductForm
                     ->icon(Heroicon::OutlinedAdjustmentsHorizontal)
                     ->description('Extra options like Sugar Level, Ice Level, or Toppings.')
                     ->collapsible()
+                    ->visible(fn () => FeatureFlags::modifiersEnabled())
                     ->schema([
                         Select::make('modifier_groups')
                             ->relationship(

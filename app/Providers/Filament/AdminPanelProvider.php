@@ -4,9 +4,11 @@ namespace App\Providers\Filament;
 
 use App\Filament\Widgets\DailySales;
 use App\Filament\Widgets\LowStockAlert;
+use App\Filament\Widgets\QuickActions;
 use App\Filament\Widgets\SalesChart;
 use App\Filament\Widgets\TopProducts;
 use App\Http\Middleware\SetLocale;
+use App\Support\FeatureFlags;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -44,20 +46,21 @@ class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
-            ->widgets([
+            ->widgets(array_filter([
+                QuickActions::class,
                 DailySales::class,
                 SalesChart::class,
                 TopProducts::class,
-                LowStockAlert::class,
-            ])
-            ->navigationGroups([
+                FeatureFlags::inventoryEnabled() ? LowStockAlert::class : null,
+            ]))
+            ->navigationGroups(array_filter([
                 __('Dashboard'),
                 __('Orders'),
                 __('Menu'),
-                __('Inventory'),
+                FeatureFlags::inventoryEnabled() ? __('Inventory') : null,
                 __('Reports'),
                 __('Settings'),
-            ])
+            ]))
             ->navigationItems([
                 NavigationItem::make(__('POS Terminal'))
                     ->url(fn (): string => url('/pos'))

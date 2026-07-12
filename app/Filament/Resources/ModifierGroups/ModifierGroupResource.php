@@ -8,6 +8,7 @@ use App\Filament\Resources\ModifierGroups\Pages\EditModifierGroup;
 use App\Filament\Resources\ModifierGroups\Pages\ListModifierGroups;
 use App\Filament\Resources\ModifierGroups\Schemas\ModifierGroupForm;
 use App\Filament\Resources\ModifierGroups\Tables\ModifierGroupsTable;
+use App\Support\FeatureFlags;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -30,9 +31,14 @@ class ModifierGroupResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Modifier Groups';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return FeatureFlags::modifiersEnabled();
+    }
+
     public static function canAccess(): bool
     {
-        return auth()->user()?->hasAnyRole(['admin', 'manager']) ?? false;
+        return FeatureFlags::modifiersEnabled() && (auth()->user()?->hasAnyRole(['admin', 'manager']) ?? false);
     }
 
     public static function getNavigationGroup(): ?string

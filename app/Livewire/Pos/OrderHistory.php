@@ -23,7 +23,7 @@ class OrderHistory extends Component
     #[Computed]
     public function orders(): array
     {
-        $query = Order::with(['user', 'items.product'])
+        $query = Order::with('user')->withCount('items')
             ->latest();
 
         if ($this->search) {

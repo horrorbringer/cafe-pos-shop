@@ -6,6 +6,7 @@ use App\Domain\Notifications\Models\NotificationLog;
 use App\Filament\Resources\Notifications\Pages\ListNotificationLogs;
 use App\Filament\Resources\Notifications\Schemas\NotificationLogForm;
 use App\Filament\Resources\Notifications\Tables\NotificationLogsTable;
+use App\Support\FeatureFlags;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -20,13 +21,16 @@ class NotificationLogResource extends Resource
 
     protected static ?int $navigationSort = 13;
 
-    protected static bool $shouldRegisterNavigation = true;
-
     protected static ?string $navigationLabel = 'Logs';
 
     protected static ?string $modelLabel = 'Notification Log';
 
     protected static ?string $pluralModelLabel = 'Notification Logs';
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return FeatureFlags::notificationsEnabled();
+    }
 
     public static function getNavigationGroup(): ?string
     {

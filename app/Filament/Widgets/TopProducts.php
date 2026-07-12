@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Domain\Ordering\Models\OrderItem;
 use App\Domain\Shared\Enums\OrderStatus;
+use App\Filament\Resources\Products\ProductResource;
 use Carbon\Carbon;
 use Filament\Widgets\Widget;
 
@@ -47,6 +48,9 @@ class TopProducts extends Widget
                 'quantity' => $item->total_quantity,
                 'revenue' => $item->total_revenue,
                 'pct' => $pct,
+                'edit_url' => $item->product
+                    ? ProductResource::getUrl('edit', ['record' => $item->product_id])
+                    : null,
             ];
         })->toArray();
     }

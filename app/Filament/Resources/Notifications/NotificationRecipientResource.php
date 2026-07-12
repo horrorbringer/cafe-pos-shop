@@ -8,6 +8,7 @@ use App\Filament\Resources\Notifications\Pages\EditNotificationRecipient;
 use App\Filament\Resources\Notifications\Pages\ListNotificationRecipients;
 use App\Filament\Resources\Notifications\Schemas\NotificationRecipientForm;
 use App\Filament\Resources\Notifications\Tables\NotificationRecipientsTable;
+use App\Support\FeatureFlags;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -22,13 +23,16 @@ class NotificationRecipientResource extends Resource
 
     protected static ?int $navigationSort = 11;
 
-    protected static bool $shouldRegisterNavigation = true;
-
     protected static ?string $navigationLabel = 'Recipients';
 
     protected static ?string $modelLabel = 'Notification Recipient';
 
     protected static ?string $pluralModelLabel = 'Notification Recipients';
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return FeatureFlags::notificationsEnabled();
+    }
 
     public static function getNavigationGroup(): ?string
     {

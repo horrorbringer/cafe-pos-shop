@@ -14,7 +14,8 @@
         @else
             <div class="space-y-3">
                 @foreach ($products as $product)
-                    <div class="flex items-center gap-3">
+                    <a href="{{ $product['edit_url'] }}"
+                        class="flex items-center gap-3 group">
                         <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0
                             @switch($product['rank'])
                                 @case(1) bg-amber-100 text-amber-700 @break
@@ -28,15 +29,15 @@
 
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center justify-between mb-1">
-                                <span class="text-sm font-medium text-gray-700 truncate">
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300 truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                                     {{ $product['name'] }}
                                 </span>
-                                <span class="text-sm font-semibold text-gray-900 ml-2">
+                                <span class="text-sm font-semibold text-gray-900 dark:text-white ml-2">
                                     ${{ number_format($product['revenue'], 2) }}
                                 </span>
                             </div>
                             <div class="flex items-center gap-2">
-                                <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="flex-1 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                                     <div class="h-full rounded-full transition-all duration-500"
                                         style="width: {{ $product['pct'] }}%"
                                         @switch($product['rank'])
@@ -48,7 +49,7 @@
                                 <span class="text-xs text-gray-400 whitespace-nowrap">{{ $product['quantity'] }} sold</span>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 @endforeach
             </div>
         @endif

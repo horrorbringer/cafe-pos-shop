@@ -8,7 +8,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Spatie\Permission\Models\Role;
 
 class UserForm
 {
@@ -63,8 +62,7 @@ class UserForm
                             ->name('roles')
                             ->required()
                             ->preload()
-                            ->searchable()
-                            ->options(fn (): array => Role::pluck('name', 'name')->toArray()),
+                            ->searchable(),
 
                         Toggle::make('is_active')
                             ->label('Active')
