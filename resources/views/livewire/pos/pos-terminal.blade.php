@@ -140,23 +140,23 @@
                             @endphp
                             <button wire:key="popular-{{ $product['id'] }}"
                                 wire:click="addItemQuick({{ $product['id'] }})"
-                                class="group relative bg-white rounded-xl border border-amber-200 p-2.5 text-left transition-all duration-150 cursor-pointer
-                                    {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'hover:shadow-md hover:border-amber-300 active:scale-[0.97]' }}"
+                                class="group relative bg-white rounded-xl border-2 border-amber-200 p-3 text-left transition-all duration-150 cursor-pointer flex flex-col
+                                    {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.97]' }}"
                             >
-                                <div class="relative">
+                                <div class="relative mb-2">
                                     @if($product['image'])
-                                        <img src="{{ asset('storage/' . $product['image']) }}" alt="{{ $product['name'] }}" class="w-full h-16 object-cover rounded-lg mb-1.5 bg-stone-100">
+                                        <img src="{{ asset('storage/' . $product['image']) }}" alt="{{ $product['name'] }}" class="w-full h-20 object-cover rounded-xl bg-stone-100">
                                     @else
-                                        <div class="w-full h-16 bg-stone-100 rounded-lg mb-1.5 flex items-center justify-center">
-                                            <svg class="w-5 h-5 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        <div class="w-full h-20 bg-stone-100 rounded-xl flex items-center justify-center">
+                                            <svg class="w-6 h-6 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                         </div>
                                     @endif
-                                    <div class="absolute inset-0 rounded-lg bg-amber-500/0 group-hover:bg-amber-500/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                        <span class="bg-amber-500 text-white text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center shadow-sm">+</span>
+                                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-amber-500 text-white rounded-full flex items-center justify-center shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                                     </div>
                                 </div>
-                                <h4 class="font-semibold text-stone-800 text-xs leading-tight">{{ $product['name'] }}</h4>
-                                <p class="text-amber-600 font-bold text-xs mt-0.5">${{ number_format($product['price'], 2) }}</p>
+                                <h4 class="font-semibold text-stone-800 text-sm leading-tight">{{ $product['name'] }}</h4>
+                                <p class="text-amber-600 font-bold text-sm mt-1">${{ number_format($product['price'], 2) }}</p>
                             </button>
                         @endforeach
                     </div>
@@ -299,58 +299,54 @@
                     <p class="text-sm text-stone-400 mt-1">{{ __('Tap a product to add it') }}</p>
                 </div>
             @else
-                <div class="divide-y divide-stone-100">
-                    @foreach($this->cartItems as $item)
-                        <div wire:key="cart-{{ $item['id'] }}" class="px-5 py-3 hover:bg-stone-50 transition-colors">
-                            <div class="flex items-start gap-3">
-                                {{-- Item Info --}}
-                                <div class="flex-1 min-w-0">
+                @foreach($this->cartItems as $item)
+                    <div wire:key="cart-{{ $item['id'] }}" class="border-l-[3px] {{ $loop->first ? 'border-l-transparent' : '' }} px-5 py-3 hover:bg-stone-50 transition-colors border-b border-stone-50 last:border-b-0">
+                        <div class="flex items-start gap-3">
+                            {{-- Item Info --}}
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-start justify-between gap-2">
                                     <h4 class="font-semibold text-stone-800 text-sm leading-tight">{{ $item['product_name'] ?? ($item['product']['name'] ?? __('Unknown')) }}</h4>
-                                    @if(!empty($item['variant_name']))
-                                        <p class="text-xs text-stone-400 mt-0.5">{{ $item['variant_name'] }}</p>
-                                    @endif
-                                    @if(!empty($item['modifiers']))
-                                        <div class="flex flex-wrap gap-1 mt-1">
-                                            @foreach($item['modifiers'] as $modifier)
-                                                <span class="text-[10px] bg-stone-100 text-stone-500 px-1.5 py-0.5 rounded">
-                                                    {{ $modifier['modifier_option_name'] }}
-                                                </span>
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                    @if(!empty($item['notes']))
-                                        <p class="text-[10px] text-stone-400 italic mt-0.5">{{ $item['notes'] }}</p>
-                                    @endif
-                                    <p class="text-xs text-stone-400 mt-1">${{ number_format($item['unit_price'], 2) }} {{ __('each') }}</p>
+                                    <p class="font-bold text-sm text-stone-800 shrink-0">${{ number_format($item['total_price'], 2) }}</p>
                                 </div>
-
-                                {{-- Quantity Controls --}}
-                                <div class="flex flex-col items-end gap-1.5">
-                                    <div class="flex items-center gap-0 bg-stone-100 rounded-lg">
+                                @if(!empty($item['variant_name']))
+                                    <p class="text-xs text-stone-400 mt-0.5">{{ $item['variant_name'] }}</p>
+                                @endif
+                                @if(!empty($item['modifiers']))
+                                    <div class="flex flex-wrap gap-1 mt-1">
+                                        @foreach($item['modifiers'] as $modifier)
+                                            <span class="text-[10px] bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded">
+                                                {{ $modifier['modifier_option_name'] }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @endif
+                                @if(!empty($item['notes']))
+                                    <p class="text-[10px] text-stone-400 italic mt-0.5">{{ $item['notes'] }}</p>
+                                @endif
+                                <div class="flex items-center gap-2 mt-1.5">
+                                    <div class="flex items-center gap-0 bg-stone-100 rounded-md">
                                         <button wire:click="updateQuantity({{ $item['id'] }}, {{ $item['quantity'] - 1 }})"
-                                            class="w-8 h-8 flex items-center justify-center text-stone-500 hover:text-stone-800 hover:bg-stone-200 rounded-l-lg transition-colors text-lg font-medium">
+                                            class="w-7 h-7 flex items-center justify-center text-stone-500 hover:text-stone-800 hover:bg-stone-200 rounded-l-md transition-colors text-base font-medium">
                                             &minus;
                                         </button>
-                                        <span class="w-8 h-8 flex items-center justify-center text-sm font-bold text-stone-800">{{ $item['quantity'] }}</span>
+                                        <span class="min-w-[1.5rem] h-7 flex items-center justify-center text-xs font-bold text-stone-800">{{ $item['quantity'] }}</span>
                                         <button wire:click="updateQuantity({{ $item['id'] }}, {{ $item['quantity'] + 1 }})"
-                                            class="w-8 h-8 flex items-center justify-center text-stone-500 hover:text-stone-800 hover:bg-stone-200 rounded-r-lg transition-colors text-lg font-medium">
+                                            class="w-7 h-7 flex items-center justify-center text-stone-500 hover:text-stone-800 hover:bg-stone-200 rounded-r-md transition-colors text-base font-medium">
                                             +
                                         </button>
                                     </div>
-                                    <div class="flex items-center gap-2">
-                                        <p class="font-bold text-sm text-stone-800">${{ number_format($item['total_price'], 2) }}</p>
-                                        <button wire:click="removeItem({{ $item['id'] }})"
-                                            class="text-stone-300 hover:text-red-500 transition-colors">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                            </svg>
-                                        </button>
-                                    </div>
+                                    <span class="text-[10px] text-stone-400">${{ number_format($item['unit_price'], 2) }} {{ __('each') }}</span>
+                                    <button wire:click="removeItem({{ $item['id'] }})"
+                                        class="ml-auto text-stone-300 hover:text-red-500 transition-colors">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                    @endforeach
-                </div>
+                    </div>
+                @endforeach
             @endif
         </div>
 
@@ -667,22 +663,25 @@
                 x-transition:enter-start="opacity-0 scale-95"
                 x-transition:enter-end="opacity-100 scale-100">
                 <div class="p-6">
-                    <h3 class="text-lg font-bold text-stone-800 mb-5">{{ __('Process Payment') }}</h3>
+                    <div class="flex items-center justify-between mb-5">
+                        <h3 class="text-lg font-bold text-stone-800">{{ __('Payment') }}</h3>
+                        <span class="text-2xl font-bold text-amber-600">${{ number_format($this->total, 2) }}</span>
+                    </div>
 
                     {{-- Payment Method --}}
                     <div class="mb-5">
                         <label class="block text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2">{{ __('Method') }}</label>
-                        <div class="grid grid-cols-{{ $this->isKhqrAvailable ? 2 : 1 }} gap-2">
+                        <div class="grid grid-cols-{{ $this->isKhqrAvailable ? 2 : 1 }} gap-3">
                             <button wire:click="selectPaymentMethod('cash')"
-                                class="py-3 px-4 rounded-xl border-2 text-sm font-semibold transition-all flex flex-col items-center gap-1
-                                    {{ $paymentMethod === 'cash' ? 'border-amber-500 bg-amber-50 text-amber-700' : 'border-stone-200 hover:border-stone-300 text-stone-600' }}">
+                                class="py-3.5 px-4 rounded-xl border-2 text-sm font-semibold transition-all flex flex-row items-center justify-center gap-2
+                                    {{ $paymentMethod === 'cash' ? 'border-amber-500 bg-amber-50 text-amber-700 ring-1 ring-amber-500' : 'border-stone-200 hover:border-stone-300 text-stone-600' }}">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 {{ __('Cash') }}
                             </button>
                             @if($this->isKhqrAvailable)
                                 <button wire:click="selectPaymentMethod('khqr')"
-                                    class="py-3 px-4 rounded-xl border-2 text-sm font-semibold transition-all flex flex-col items-center gap-1
-                                        {{ $paymentMethod === 'khqr' ? 'border-amber-500 bg-amber-50 text-amber-700' : 'border-stone-200 hover:border-stone-300 text-stone-600' }}">
+                                    class="py-3.5 px-4 rounded-xl border-2 text-sm font-semibold transition-all flex flex-row items-center justify-center gap-2
+                                        {{ $paymentMethod === 'khqr' ? 'border-amber-500 bg-amber-50 text-amber-700 ring-1 ring-amber-500' : 'border-stone-200 hover:border-stone-300 text-stone-600' }}">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
                                     {{ __('KHQR') }}
                                 </button>
@@ -698,7 +697,7 @@
                                 @php $denominations = config('pos.cash_denominations', [1, 2, 5, 10, 20, 50, 100]); @endphp
                                 @foreach($denominations as $amount)
                                     <button wire:key="cash-{{ $amount }}" wire:click="$set('amountTendered', {{ $amount }})"
-                                        class="py-2 rounded-lg text-sm font-semibold transition-colors
+                                        class="py-2.5 rounded-lg text-sm font-semibold transition-all
                                             {{ $amountTendered == $amount
                                                 ? 'ring-2 ring-amber-500 bg-amber-50 text-amber-700'
                                                 : ($amount >= $this->total ? 'bg-stone-100 hover:bg-stone-200 text-stone-700' : 'bg-stone-50 text-stone-400') }}">
@@ -706,7 +705,7 @@
                                     </button>
                                 @endforeach
                                 <button wire:click="$set('amountTendered', {{ $this->total }})"
-                                    class="py-2 rounded-lg text-sm font-bold transition-colors
+                                    class="py-2.5 rounded-lg text-sm font-bold transition-all
                                         {{ $amountTendered == $this->total
                                             ? 'ring-2 ring-green-500 bg-green-50 text-green-700'
                                             : 'bg-green-100 hover:bg-green-200 text-green-700' }}">
@@ -716,34 +715,44 @@
                         </div>
 
                         {{-- Amount Tendered --}}
-                        <div class="mb-5">
+                        <div class="mb-4">
                             <label class="block text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2">{{ __('Amount Tendered') }}</label>
-                            <input type="number" wire:model.live="amountTendered" step="0.01" min="0"
-                                class="w-full px-4 py-3 border border-stone-200 rounded-xl text-xl font-bold text-center focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-stone-50"
-                                placeholder="0.00" x-ref="cashInput" x-init="$nextTick(() => $refs.cashInput.focus())">
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-stone-300">$</span>
+                                <input type="number" wire:model.live="amountTendered" step="0.01" min="0"
+                                    class="w-full pl-10 pr-4 py-3.5 border-2 border-stone-200 rounded-xl text-2xl font-bold text-center focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white"
+                                    placeholder="0.00" x-ref="cashInput" x-init="$nextTick(() => $refs.cashInput.focus()); $refs.cashInput.select()">
+                            </div>
                         </div>
                     @endif
 
                     {{-- Total & Change --}}
                     <div class="bg-stone-50 rounded-xl p-4 mb-5 space-y-2">
-                        <div class="flex justify-between text-lg font-bold">
-                            <span class="text-stone-800">{{ __('Total Due') }}</span>
-                            <span class="text-amber-600">${{ number_format($this->total, 2) }}</span>
+                        <div class="flex justify-between">
+                            <span class="text-stone-500 text-sm">{{ __('Subtotal') }}</span>
+                            <span class="font-medium text-sm">${{ number_format($this->subtotal, 2) }}</span>
                         </div>
-                        @if($paymentMethod === 'cash')
-                            @if($amountTendered > 0)
-                                @if($amountTendered >= $this->total)
-                                    <div class="flex justify-between text-green-600 font-bold">
-                                        <span>{{ __('Change') }}</span>
-                                        <span>${{ number_format($amountTendered - $this->total, 2) }}</span>
-                                    </div>
-                                @else
-                                    <div class="flex justify-between text-red-500 font-medium text-sm">
-                                        <span>{{ __('Remaining') }}</span>
-                                        <span>${{ number_format($this->total - $amountTendered, 2) }}</span>
-                                    </div>
-                                @endif
-                            @endif
+                        @if($this->order && $this->order->discount > 0)
+                            <div class="flex justify-between text-green-600 text-sm">
+                                <span>{{ __('Discount') }}</span>
+                                <span class="font-medium">-${{ number_format($this->order->discount, 2) }}</span>
+                            </div>
+                        @endif
+                        <div class="flex justify-between border-t border-stone-200 pt-2">
+                            <span class="font-bold text-stone-800">{{ __('Total') }}</span>
+                            <span class="font-bold text-xl text-amber-600">${{ number_format($this->total, 2) }}</span>
+                        </div>
+                        @if($paymentMethod === 'cash' && $amountTendered > 0)
+                            <div class="flex justify-between pt-1 border-t border-dashed border-stone-300">
+                                <span class="font-semibold text-sm">{{ $amountTendered >= $this->total ? __('Change') : __('Remaining') }}</span>
+                                <span class="font-bold text-lg {{ $amountTendered >= $this->total ? 'text-green-600' : 'text-red-500' }}">
+                                    @if($amountTendered >= $this->total)
+                                        ${{ number_format($amountTendered - $this->total, 2) }}
+                                    @else
+                                        -${{ number_format($this->total - $amountTendered, 2) }}
+                                    @endif
+                                </span>
+                            </div>
                         @endif
                     </div>
 
@@ -755,13 +764,15 @@
                         </button>
                         @if($paymentMethod === 'cash')
                             <button wire:click="processPayment"
-                                class="flex-1 px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold transition-colors shadow-sm shadow-green-200 flex items-center justify-center gap-2
+                                class="flex-[2] px-4 py-3 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white rounded-xl font-bold transition-all shadow-sm shadow-green-200 flex items-center justify-center gap-2 text-base
                                     {{ $amountTendered < $this->total ? 'opacity-50 cursor-not-allowed' : '' }}"
                                 @if($amountTendered < $this->total) disabled @endif
                                 wire:loading.attr="disabled">
-                                <svg wire:loading wire:target="processPayment" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-                                <span wire:loading.remove wire:target="processPayment">Complete Sale</span>
-                                <span wire:loading wire:target="processPayment">Processing...</span>
+                                <svg wire:loading wire:target="processPayment" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                                <span wire:loading.remove wire:target="processPayment">
+                                    {{ $amountTendered >= $this->total ? __('Complete Sale') : __('Pay') }} ${{ number_format(min($this->total, $amountTendered), 2) }}
+                                </span>
+                                <span wire:loading wire:target="processPayment">{{ __('Processing...') }}</span>
                             </button>
                         @endif
                     </div>
