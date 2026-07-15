@@ -363,7 +363,7 @@ class PosTerminal extends Component
 
         $existingItem = $this->order->items()
             ->where('product_id', $productId)
-            ->whereNull('product_variant_id')
+            ->whereNull('variant_name')
             ->whereNull('notes')
             ->doesntHave('modifiers')
             ->first();
