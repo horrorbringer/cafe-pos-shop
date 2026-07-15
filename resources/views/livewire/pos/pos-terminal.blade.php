@@ -1,6 +1,7 @@
 <div class="flex h-screen bg-stone-50 text-stone-800 select-none"
     x-data="{ addingFlash: null, processing: $wire.entangle('processing') }"
     x-on:item-added.window="addingFlash = $event.detail.productId; setTimeout(() => addingFlash = null, 400)"
+    x-on:browser-print.window="setTimeout(() => { const el = document.getElementById('receipt-print-area'); if (el) { const w = window.open('', '_blank', 'width=400,height=600'); w.document.write('<pre style=\"font-family:monospace;font-size:12px;padding:20px\">' + el.innerText + '</pre>'); w.document.close(); w.print(); w.close(); } }, 300)"
     @keydown.escape.window="if ($wire.showModifierModal) $wire.cancelModifierModal(); else if ($wire.showPaymentModal) $wire.set('showPaymentModal', false); else if ($wire.showKhqrModal) $wire.cancelKhqr(); else if ($wire.showReceiptModal) false"
     @keydown.enter.window="if ($wire.showPaymentModal && $wire.paymentMethod === 'cash' && $wire.amountTendered >= $wire.total) $wire.processPayment()"
     @keydown.f2.window.prevent="$wire.openPaymentModal()"
@@ -970,7 +971,7 @@
                         <p class="text-xs text-stone-400 mt-1">{{ __('Order has been processed successfully') }}</p>
                     </div>
 
-                    <div class="bg-stone-50 rounded-xl p-3 font-mono text-xs leading-relaxed whitespace-pre-wrap text-stone-700 border border-stone-100 max-h-48 overflow-y-auto">
+                    <div id="receipt-print-area" class="bg-stone-50 rounded-xl p-3 font-mono text-xs leading-relaxed whitespace-pre-wrap text-stone-700 border border-stone-100 max-h-48 overflow-y-auto">
                         {{ $receiptContent }}
                     </div>
 

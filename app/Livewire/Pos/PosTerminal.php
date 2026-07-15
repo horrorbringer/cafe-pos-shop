@@ -520,11 +520,15 @@ class PosTerminal extends Component
 
                 $this->order = $order;
                 $this->receiptContent = $this->receiptService->generateReceiptContent($order);
-                $this->receiptService->print($order);
                 $this->khqrData = null;
                 $this->showKhqrModal = false;
                 $this->showPaymentModal = false;
                 $this->showReceiptModal = true;
+
+                if ($this->receiptService->shouldAutoPrint()) {
+                    $this->receiptService->print($order);
+                    $this->dispatch('browser-print');
+                }
 
                 $this->dispatch('show-toast', message: __('Payment confirmed! Receipt printed.'), type: 'success');
             } else {
@@ -560,9 +564,13 @@ class PosTerminal extends Component
 
             $this->order = $order;
             $this->receiptContent = $this->receiptService->generateReceiptContent($order);
-            $this->receiptService->print($order);
             $this->showPaymentModal = false;
             $this->showReceiptModal = true;
+
+            if ($this->receiptService->shouldAutoPrint()) {
+                $this->receiptService->print($order);
+                $this->dispatch('browser-print');
+            }
 
             $this->processing = false;
 
@@ -588,7 +596,7 @@ class PosTerminal extends Component
     {
         $order = Order::findOrFail($this->order->id);
         $this->receiptService->print($order);
-
+        $this->dispatch('browser-print');
         $this->dispatch('show-toast', message: __('Receipt sent to printer'), type: 'success');
     }
 

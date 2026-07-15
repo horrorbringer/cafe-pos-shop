@@ -302,10 +302,15 @@ class ReceiptPrinterService
         </div>';
     }
 
+    public function shouldAutoPrint(): bool
+    {
+        return Setting::getValue('receipt_auto_print', true);
+    }
+
     public function print(Order $order): bool
     {
         $content = $this->generateReceiptContent($order);
-        $printerType = Setting::getValue('receipt_printer', 'default');
+        $printerType = Setting::getValue('receipt_printer', 'browser');
 
         if ($printerType === 'pdf') {
             $html = $this->generateReceiptHtml($order);
@@ -330,6 +335,8 @@ class ReceiptPrinterService
             }
         }
 
+        // 'browser' and 'default' modes don't send to a printer from server-side
+        // Browser printing is handled by the frontend via window.print()
         return true;
     }
 
@@ -347,7 +354,7 @@ class ReceiptPrinterService
 
     public function getPaperWidth(): int
     {
-        $printerType = Setting::getValue('receipt_printer', 'default');
+        $printerType = Setting::getValue('receipt_printer', 'browser');
 
         return match ($printerType) {
             'thermal' => 32,

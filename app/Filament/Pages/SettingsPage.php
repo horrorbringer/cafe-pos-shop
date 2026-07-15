@@ -95,6 +95,8 @@ class SettingsPage extends Page
 
     public bool $receiptShowNotes = true;
 
+    public bool $receiptAutoPrint = true;
+
     public bool $inventoryEnabled = false;
 
     public bool $branchesEnabled = false;
@@ -145,6 +147,7 @@ class SettingsPage extends Page
         $this->receiptShowDiscount = Setting::getValue('receipt_show_discount', true);
         $this->receiptShowPayment = Setting::getValue('receipt_show_payment', true);
         $this->receiptShowNotes = Setting::getValue('receipt_show_notes', true);
+        $this->receiptAutoPrint = Setting::getValue('receipt_auto_print', true);
 
         $this->inventoryEnabled = Setting::getValue('inventory_enabled', false);
         $this->branchesEnabled = Setting::getValue('branches_enabled', false);
@@ -380,15 +383,23 @@ class SettingsPage extends Page
                                                             ->native(false),
 
                                                         Select::make('receiptPrinter')
-                                                            ->label('Paper Width')
+                                                            ->label('Printer Type')
                                                             ->options([
-                                                                'default' => 'Standard (40 chars)',
-                                                                'thermal' => 'Thermal Printer (32 chars)',
-                                                                'pdf' => 'PDF / Email (48 chars)',
+                                                                'browser' => 'Browser Print (opens print dialog)',
+                                                                'thermal' => 'Thermal Printer (ESC/POS)',
+                                                                'pdf' => 'PDF / Email (save to file)',
+                                                                'default' => 'None (display only)',
                                                             ])
-                                                            ->default('default')
-                                                            ->helperText('Wider formats show more columns.')
+                                                            ->default('browser')
+                                                            ->helperText('How receipts are printed after payment.')
                                                             ->live(),
+
+                                                        Toggle::make('receiptAutoPrint')
+                                                            ->label('Auto-print after payment')
+                                                            ->helperText('Automatically print receipt when payment is completed. If disabled, cashier must click Print manually.')
+                                                            ->default(true)
+                                                            ->live()
+                                                            ->columnSpanFull(),
 
                                                         Action::make('printTest')
                                                             ->label('Print Test')
@@ -569,6 +580,7 @@ class SettingsPage extends Page
         Setting::setValue('receipt_printer_ip', $this->receiptPrinterIp, 'string');
         Setting::setValue('receipt_printer_port', (string) $this->receiptPrinterPort, 'integer');
         Setting::setValue('receipt_printer_encoding', $this->receiptPrinterEncoding, 'string');
+        Setting::setValue('receipt_auto_print', $this->receiptAutoPrint ? '1' : '0', 'boolean');
         Setting::setValue('receipt_show_address', $this->receiptShowAddress ? '1' : '0', 'boolean');
         Setting::setValue('receipt_show_phone', $this->receiptShowPhone ? '1' : '0', 'boolean');
         Setting::setValue('receipt_show_logo', $this->receiptShowLogo ? '1' : '0', 'boolean');
@@ -602,6 +614,10 @@ class SettingsPage extends Page
         Setting::setValue('receipt_footer', $state['receiptFooter'], 'string');
         Setting::setValue('receipt_printer', $state['receiptPrinter'], 'string');
         Setting::setValue('receipt_template', $state['receiptTemplate'], 'string');
+        Setting::setValue('receipt_printer_ip', $state['receiptPrinterIp'] ?? '', 'string');
+        Setting::setValue('receipt_printer_port', (string) ($state['receiptPrinterPort'] ?? 9100), 'integer');
+        Setting::setValue('receipt_printer_encoding', $state['receiptPrinterEncoding'] ?? 'CP437', 'string');
+        Setting::setValue('receipt_auto_print', $state['receiptAutoPrint'] ? '1' : '0', 'boolean');
         Setting::setValue('receipt_show_address', $state['receiptShowAddress'] ? '1' : '0', 'boolean');
         Setting::setValue('receipt_show_phone', $state['receiptShowPhone'] ? '1' : '0', 'boolean');
         Setting::setValue('receipt_show_logo', $state['receiptShowLogo'] ? '1' : '0', 'boolean');
