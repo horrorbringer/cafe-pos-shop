@@ -25,4 +25,11 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
-.nvmrc
+
+# AI agent configs (local only)
+/.opencode
+/.claude
+/.agents
+/graphify-out
+/opencode.json
+/CLAUDE.md
