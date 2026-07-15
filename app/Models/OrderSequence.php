@@ -20,15 +20,12 @@ class OrderSequence extends Model
     {
         $date = now()->toDateString();
 
-        return DB::transaction(function () use ($date) {
-            $sequence = self::lockForUpdate()->firstOrCreate(
-                ['date' => $date],
-                ['last_sequence' => 0],
-            );
+        self::upsert(
+            [['date' => $date, 'last_sequence' => 1]],
+            ['date'],
+            ['last_sequence' => DB::raw('last_sequence + 1')],
+        );
 
-            $sequence->increment('last_sequence');
-
-            return $sequence->last_sequence;
-        });
+        return (int) self::where('date', $date)->value('last_sequence');
     }
 }
