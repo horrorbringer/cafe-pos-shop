@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\DB;
 
 class Order extends Model
 {
@@ -84,12 +83,9 @@ class Order extends Model
     {
         $today = now()->format('Ymd');
         $prefix = "ORD-{$today}-";
+        $sequence = OrderSequence::getNextSequence();
 
-        return DB::transaction(function () use ($prefix) {
-            $sequence = OrderSequence::getNextSequence();
-
-            return $prefix.str_pad($sequence, 4, '0', STR_PAD_LEFT);
-        });
+        return $prefix.str_pad($sequence, 4, '0', STR_PAD_LEFT);
     }
 
     public function canTransitionTo(OrderStatus $target): bool

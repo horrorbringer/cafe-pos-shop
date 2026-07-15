@@ -370,6 +370,7 @@ class PosTerminal extends Component
 
         if ($existingItem) {
             $this->updateQuantity($existingItem->id, $existingItem->quantity + 1);
+            $this->dispatch('item-added', productId: $productId);
             $this->dispatch('show-toast', message: $product->name.' x'.$existingItem->quantity, type: 'success');
 
             return;
@@ -379,6 +380,7 @@ class PosTerminal extends Component
 
         $this->order = $this->order->fresh();
 
+        $this->dispatch('item-added', productId: $productId);
         $this->dispatch('show-toast', message: $product->name.' added', type: 'success');
     }
 

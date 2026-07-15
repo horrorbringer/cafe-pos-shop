@@ -2,60 +2,76 @@
     x-data="{ addingFlash: null, processing: $wire.entangle('processing') }"
     x-on:item-added.window="addingFlash = $event.detail.productId; setTimeout(() => addingFlash = null, 400)"
     @keydown.escape.window="if ($wire.showModifierModal) $wire.cancelModifierModal(); else if ($wire.showPaymentModal) $wire.set('showPaymentModal', false); else if ($wire.showKhqrModal) $wire.cancelKhqr(); else if ($wire.showReceiptModal) false"
-    @keydown.enter.window="if ($wire.showPaymentModal && $wire.paymentMethod === 'cash' && $wire.amountTendered >= $wire.total) $wire.processPayment()">
+    @keydown.enter.window="if ($wire.showPaymentModal && $wire.paymentMethod === 'cash' && $wire.amountTendered >= $wire.total) $wire.processPayment()"
+    @keydown.f2.window.prevent="$wire.openPaymentModal()"
+    @keydown.f4.window.prevent="$wire.holdOrder()"
+    @keydown.f9.window.prevent="$wire.cancelOrder()">
 
     {{-- Left Panel: Products --}}
     <div class="flex-1 flex flex-col overflow-hidden min-w-0">
 
         {{-- Top Bar --}}
-        <div class="bg-white border-b border-stone-200 px-5 py-3 flex items-center gap-3 shrink-0">
-            <div class="flex items-center gap-3 shrink-0">
+        <div class="bg-white border-b border-stone-200 px-5 py-3 flex items-center gap-4 shrink-0">
+            <div class="flex items-center gap-2.5 shrink-0">
+                <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center shadow-sm">
+                    <svg class="w-4.5 h-4.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/>
+                    </svg>
+                </div>
                 <h1 class="text-lg font-bold text-stone-800 tracking-tight">POS</h1>
             </div>
 
             {{-- Search --}}
             <div class="relative flex-1 max-w-md">
-                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
-                <input type="text" wire:model.live.debounce.300ms="search" placeholder="{{ __('Search...') }}"
-                    class="w-full pl-9 pr-4 py-1.5 border border-stone-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-stone-50"
+                <input type="text" wire:model.live.debounce.300ms="search" placeholder="{{ __('Search products...') }}"
+                    class="w-full pl-10 pr-4 py-2 border border-stone-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500/40 focus:border-amber-400 bg-stone-50 placeholder:text-stone-400"
                     x-ref="searchInput" x-init="$el.focus()">
+                @if($search)
+                    <button wire:click="$set('search', '')" class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                @endif
             </div>
 
-            <div class="flex items-center gap-2 ml-auto">
+            <div class="flex items-center gap-1.5 ml-auto">
                 <button onclick="window.open('{{ route('pos.customer-display') }}', 'customer-display', 'width=800,height=600')"
-                    class="text-xs text-stone-400 hover:text-stone-600 hover:bg-stone-100 px-2 py-1 rounded transition-colors flex items-center gap-1"
+                    class="text-xs text-stone-500 hover:text-indigo-600 hover:bg-indigo-50 px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1.5"
                     title="{{ __('Open customer display') }}">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25A2.25 2.25 0 015.25 3h13.5A2.25 2.25 0 0121 5.25z"/>
                     </svg>
                     {{ __('Display') }}
                 </button>
                 @if($this->itemCount > 0)
                     <button wire:click="holdOrder"
-                        class="text-xs text-stone-500 hover:text-amber-600 hover:bg-amber-50 px-2 py-1 rounded transition-colors flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        class="text-xs text-stone-500 hover:text-amber-600 hover:bg-amber-50 px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 font-medium">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M14.25 9v6m-4.5 0V9M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                         {{ __('Hold') }}
+                        <kbd class="text-[9px] font-mono bg-stone-100 text-stone-500 px-1.5 py-0.5 rounded">F4</kbd>
                     </button>
                 @endif
                 @php $heldCount = count($this->suspendedOrders); @endphp
                 @if($heldCount > 0)
                     <button wire:click="$toggle('showSuspendedOrders')"
-                        class="relative text-xs text-stone-500 hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded transition-colors flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                        class="relative text-xs text-stone-500 hover:text-blue-600 hover:bg-blue-50 px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 font-medium">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/>
                         </svg>
                         {{ __('Held') }}
-                        <span class="bg-blue-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full -mr-1">{{ $heldCount }}</span>
+                        <span class="bg-blue-500 text-white text-[9px] font-bold w-4.5 h-4.5 rounded-full flex items-center justify-center">{{ $heldCount }}</span>
                     </button>
                 @endif
                 @if($this->itemCount > 0)
                     <button wire:click="cancelOrder"
-                        class="text-xs text-stone-400 hover:text-red-500 hover:bg-red-50 px-2 py-1 rounded transition-colors">
+                        class="text-xs text-stone-400 hover:text-red-500 hover:bg-red-50 px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 font-medium">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+                        </svg>
                         {{ __('Clear') }}
                     </button>
                 @endif
@@ -93,17 +109,20 @@
             </div>
 
             {{-- Order Type Toggle --}}
-            <div class="flex items-center gap-1 bg-stone-100 rounded-lg p-1 w-fit">
+            <div class="flex items-center gap-1 bg-stone-100 rounded-xl p-1 w-fit">
                 <button wire:click="$set('orderType', 'dine_in')"
-                    class="px-4 py-1.5 rounded-md text-sm font-medium transition-all {{ $orderType === 'dine_in' ? 'bg-amber-500 text-white shadow-sm' : 'text-stone-600 hover:text-stone-800' }}">
+                    class="px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 {{ $orderType === 'dine_in' ? 'bg-amber-500 text-white shadow-sm' : 'text-stone-600 hover:text-stone-800 hover:bg-stone-200' }}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 8.25v-1.5m0 1.5c-1.355 0-2.697.056-4.024.166C6.845 8.51 6 9.473 6 10.608v2.513m6-4.871c1.355 0 2.697.056 4.024.166C17.155 8.51 18 9.473 18 10.608v2.513M15 8.25v-1.5m-6 1.5v-1.5m12 9.75l-1.5.75a3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0L3 16.5m15-12.75H6"/></svg>
                     {{ __('Dine-in') }}
                 </button>
                 <button wire:click="$set('orderType', 'takeaway')"
-                    class="px-4 py-1.5 rounded-md text-sm font-medium transition-all {{ $orderType === 'takeaway' ? 'bg-amber-500 text-white shadow-sm' : 'text-stone-600 hover:text-stone-800' }}">
+                    class="px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 {{ $orderType === 'takeaway' ? 'bg-amber-500 text-white shadow-sm' : 'text-stone-600 hover:text-stone-800 hover:bg-stone-200' }}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
                     {{ __('Takeaway') }}
                 </button>
                 <button wire:click="$set('orderType', 'delivery')"
-                    class="px-4 py-1.5 rounded-md text-sm font-medium transition-all {{ $orderType === 'delivery' ? 'bg-amber-500 text-white shadow-sm' : 'text-stone-600 hover:text-stone-800' }}">
+                    class="px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 {{ $orderType === 'delivery' ? 'bg-amber-500 text-white shadow-sm' : 'text-stone-600 hover:text-stone-800 hover:bg-stone-200' }}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
                     {{ __('Delivery') }}
                 </button>
             </div>
@@ -147,8 +166,8 @@
                                     @if($product['image'])
                                         <img src="{{ asset('storage/' . $product['image']) }}" alt="{{ $product['name'] }}" class="w-full h-20 object-cover rounded-xl bg-stone-100">
                                     @else
-                                        <div class="w-full h-20 bg-stone-100 rounded-xl flex items-center justify-center">
-                                            <svg class="w-6 h-6 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        <div class="w-full h-20 bg-gradient-to-br from-amber-50 to-stone-100 rounded-xl flex items-center justify-center">
+                                            <svg class="w-6 h-6 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25" d="M12 18a3.75 3.75 0 00.495-7.467 5.99 5.99 0 00-1.925 3.546 5.974 5.974 0 01-2.133-1.001A3.75 3.75 0 0012 18z"/></svg>
                                         </div>
                                     @endif
                                     <div class="absolute -top-1 -right-1 w-6 h-6 bg-amber-500 text-white rounded-full flex items-center justify-center shadow-sm">
@@ -188,6 +207,8 @@
                             @endphp
                             <button wire:key="product-{{ $product['id'] }}"
                                 wire:click="addItemQuick({{ $product['id'] }})"
+                                wire:loading.class="opacity-70 pointer-events-none"
+                                wire:target="addItemQuick({{ $product['id'] }})"
                                 class="group relative bg-white rounded-xl border-2 p-4 text-left transition-all duration-150 flex flex-col
                                     {{ $isOutOfStock
                                         ? 'opacity-40 cursor-not-allowed border-stone-100'
@@ -198,17 +219,23 @@
                                         <img src="{{ asset('storage/' . $product['image']) }}" alt="{{ $product['name'] }}"
                                             class="w-full h-32 object-cover rounded-xl bg-stone-100">
                                     @else
-                                        <div class="w-full h-32 bg-stone-100 rounded-xl flex items-center justify-center">
-                                            <svg class="w-10 h-10 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        <div class="w-full h-32 bg-gradient-to-br from-stone-100 to-stone-50 rounded-xl flex items-center justify-center">
+                                            <svg class="w-10 h-10 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25" d="M12 18a3.75 3.75 0 00.495-7.467 5.99 5.99 0 00-1.925 3.546 5.974 5.974 0 01-2.133-1.001A3.75 3.75 0 0012 18z"/></svg>
                                         </div>
                                     @endif
                                     @if(!empty($product['tags']))
                                         <div class="absolute top-2 left-2 flex flex-wrap gap-1">
                                             @foreach((array) $product['tags'] as $tag)
                                                 @if($tag === 'new')
-                                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500 text-white shadow-sm">{{ __('NEW') }}</span>
+                                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-500 text-white shadow-sm flex items-center gap-0.5">
+                                                        <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clip-rule="evenodd"/></svg>
+                                                        {{ __('NEW') }}
+                                                    </span>
                                                 @elseif($tag === 'signature')
-                                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500 text-white shadow-sm">{{ __('SIGNATURE') }}</span>
+                                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purple-500 text-white shadow-sm flex items-center gap-0.5">
+                                                        <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+                                                        {{ __('SIGNATURE') }}
+                                                    </span>
                                                 @endif
                                             @endforeach
                                         </div>
@@ -243,12 +270,21 @@
                                     @endif
                                     <div class="flex items-center gap-1 flex-wrap">
                                         @if($hasOptions)
-                                            <span class="text-[10px] font-medium bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">{{ __('Options') }}</span>
+                                            <span class="text-[10px] font-medium bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full flex items-center gap-0.5">
+                                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"/></svg>
+                                                {{ __('Options') }}
+                                            </span>
                                         @elseif(!$isOutOfStock)
-                                            <span class="text-[10px] font-medium bg-green-50 text-green-600 px-2 py-0.5 rounded-full">{{ __('Quick add') }}</span>
+                                            <span class="text-[10px] font-medium bg-green-50 text-green-600 px-2 py-0.5 rounded-full flex items-center gap-0.5">
+                                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                                {{ __('Quick add') }}
+                                            </span>
                                         @endif
                                         @if($isLowStock && !$isOutOfStock)
-                                            <span class="text-[10px] font-medium bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full">{{ $product['stock_quantity'] }} {{ __('left') }}</span>
+                                            <span class="text-[10px] font-medium bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full flex items-center gap-0.5">
+                                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"/></svg>
+                                                {{ $product['stock_quantity'] }} {{ __('left') }}
+                                            </span>
                                         @endif
                                     </div>
                                 </div>
@@ -270,7 +306,12 @@
                     <svg class="w-5 h-5 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                     </svg>
-                    <h2 class="font-bold text-stone-800">{{ __('Cart') }}</h2>
+                    <div>
+                        <h2 class="font-bold text-stone-800">{{ __('Cart') }}</h2>
+                        @if($this->order)
+                            <p class="text-[10px] text-stone-400 font-mono">{{ $this->order->order_number }}</p>
+                        @endif
+                    </div>
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="text-xs font-medium bg-stone-100 text-stone-500 px-2 py-0.5 rounded-full">
@@ -290,17 +331,17 @@
         <div class="flex-1 overflow-y-auto">
             @if(empty($this->cartItems))
                 <div class="flex flex-col items-center justify-center h-full text-stone-400 px-6">
-                    <div class="w-20 h-20 bg-stone-100 rounded-full flex items-center justify-center mb-4">
-                        <svg class="w-10 h-10 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    <div class="w-20 h-20 bg-gradient-to-br from-stone-100 to-stone-50 rounded-full flex items-center justify-center mb-4">
+                        <svg class="w-9 h-9 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/>
                         </svg>
                     </div>
-                    <p class="font-medium text-stone-500">{{ __('Cart is empty') }}</p>
-                    <p class="text-sm text-stone-400 mt-1">{{ __('Tap a product to add it') }}</p>
+                    <p class="font-semibold text-stone-500">{{ __('Cart is empty') }}</p>
+                    <p class="text-xs text-stone-400 mt-1 text-center">{{ __('Tap a product to add it here') }}</p>
                 </div>
             @else
                 @foreach($this->cartItems as $item)
-                    <div wire:key="cart-{{ $item['id'] }}" class="border-l-[3px] {{ $loop->first ? 'border-l-transparent' : '' }} px-5 py-3 hover:bg-stone-50 transition-colors border-b border-stone-50 last:border-b-0">
+                    <div wire:key="cart-{{ $item['id'] }}" class="px-5 py-3 hover:bg-stone-50 transition-colors border-b border-stone-100 last:border-b-0">
                         <div class="flex items-start gap-3">
                             {{-- Item Info --}}
                             <div class="flex-1 min-w-0">
@@ -323,23 +364,27 @@
                                 @if(!empty($item['notes']))
                                     <p class="text-[10px] text-stone-400 italic mt-0.5">{{ $item['notes'] }}</p>
                                 @endif
-                                <div class="flex items-center gap-2 mt-1.5">
-                                    <div class="flex items-center gap-0 bg-stone-100 rounded-md">
+                                <div class="flex items-center gap-2 mt-2">
+                                    <div class="inline-flex items-center bg-stone-100 rounded-lg overflow-hidden">
                                         <button wire:click="updateQuantity({{ $item['id'] }}, {{ $item['quantity'] - 1 }})"
-                                            class="w-7 h-7 flex items-center justify-center text-stone-500 hover:text-stone-800 hover:bg-stone-200 rounded-l-md transition-colors text-base font-medium">
-                                            &minus;
+                                            class="w-7 h-7 flex items-center justify-center text-stone-500 hover:text-white hover:bg-red-400 transition-colors text-sm font-bold">
+                                            @if($item['quantity'] === 1)
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                                            @else
+                                                &minus;
+                                            @endif
                                         </button>
-                                        <span class="min-w-[1.5rem] h-7 flex items-center justify-center text-xs font-bold text-stone-800">{{ $item['quantity'] }}</span>
+                                        <span class="min-w-[1.75rem] h-7 flex items-center justify-center text-xs font-bold text-stone-800 bg-white border-x border-stone-200">{{ $item['quantity'] }}</span>
                                         <button wire:click="updateQuantity({{ $item['id'] }}, {{ $item['quantity'] + 1 }})"
-                                            class="w-7 h-7 flex items-center justify-center text-stone-500 hover:text-stone-800 hover:bg-stone-200 rounded-r-md transition-colors text-base font-medium">
+                                            class="w-7 h-7 flex items-center justify-center text-stone-500 hover:text-white hover:bg-green-500 transition-colors text-sm font-bold">
                                             +
                                         </button>
                                     </div>
                                     <span class="text-[10px] text-stone-400">${{ number_format($item['unit_price'], 2) }} {{ __('each') }}</span>
                                     <button wire:click="removeItem({{ $item['id'] }})"
-                                        class="ml-auto text-stone-300 hover:text-red-500 transition-colors">
+                                        class="ml-auto w-6 h-6 rounded-md flex items-center justify-center text-stone-300 hover:text-red-500 hover:bg-red-50 transition-colors">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
                                         </svg>
                                     </button>
                                 </div>
@@ -355,31 +400,44 @@
             <div class="border-t border-stone-200 bg-white">
                 {{-- Order Notes --}}
                 <div class="px-5 pt-3">
-                    <input type="text" wire:model.live="orderNotes" placeholder="{{ __('Order notes...') }}"
-                        class="w-full px-3 py-2 border border-stone-200 rounded-lg text-xs focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-stone-50">
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/>
+                        </svg>
+                        <input type="text" wire:model.live="orderNotes" placeholder="{{ __('Order notes...') }}"
+                            class="w-full pl-9 pr-4 py-2 border border-stone-200 rounded-lg text-xs focus:ring-2 focus:ring-amber-500/40 focus:border-amber-400 bg-stone-50 placeholder:text-stone-400">
+                    </div>
                 </div>
 
                 {{-- Discount --}}
-                <div class="px-5 pt-2">
+                <div class="px-5 pt-2.5">
+                    <div class="flex items-center gap-1.5 mb-1.5">
+                        <svg class="w-3 h-3 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 6h.008v.008H6V6z"/>
+                        </svg>
+                        <span class="text-[10px] font-semibold text-stone-400 uppercase tracking-wider">{{ __('Discount') }}</span>
+                    </div>
                     <div class="flex items-center gap-1.5">
                         <button wire:click="applyDiscountPercent(10)"
-                            class="text-[10px] font-medium px-2 py-1 rounded border transition-colors
-                                {{ $this->isActiveDiscountPercent(10) ? 'bg-green-50 border-green-300 text-green-700' : 'border-stone-200 text-stone-500 hover:border-stone-300' }}">
+                            class="text-[10px] font-medium px-2.5 py-1 rounded-md border transition-all
+                                {{ $this->isActiveDiscountPercent(10) ? 'bg-green-50 border-green-300 text-green-700 shadow-sm' : 'border-stone-200 text-stone-500 hover:border-stone-300 hover:bg-stone-50' }}">
                             10%
                         </button>
                         <button wire:click="applyDiscountPercent(20)"
-                            class="text-[10px] font-medium px-2 py-1 rounded border transition-colors
-                                {{ $this->isActiveDiscountPercent(20) ? 'bg-green-50 border-green-300 text-green-700' : 'border-stone-200 text-stone-500 hover:border-stone-300' }}">
+                            class="text-[10px] font-medium px-2.5 py-1 rounded-md border transition-all
+                                {{ $this->isActiveDiscountPercent(20) ? 'bg-green-50 border-green-300 text-green-700 shadow-sm' : 'border-stone-200 text-stone-500 hover:border-stone-300 hover:bg-stone-50' }}">
                             20%
                         </button>
                         <button wire:click="applyDiscountPercent(50)"
-                            class="text-[10px] font-medium px-2 py-1 rounded border transition-colors
-                                {{ $this->isActiveDiscountPercent(50) ? 'bg-green-50 border-green-300 text-green-700' : 'border-stone-200 text-stone-500 hover:border-stone-300' }}">
+                            class="text-[10px] font-medium px-2.5 py-1 rounded-md border transition-all
+                                {{ $this->isActiveDiscountPercent(50) ? 'bg-green-50 border-green-300 text-green-700 shadow-sm' : 'border-stone-200 text-stone-500 hover:border-stone-300 hover:bg-stone-50' }}">
                             50%
                         </button>
                         @if($this->order && $this->order->discount > 0)
                             <button wire:click="applyDiscount(0)"
-                                class="text-[10px] font-medium px-2 py-1 rounded border border-red-200 text-red-500 hover:bg-red-50 transition-colors">
+                                class="text-[10px] font-medium px-2.5 py-1 rounded-md border border-red-200 text-red-500 hover:bg-red-50 transition-all flex items-center gap-0.5">
+                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                                 {{ __('Remove') }}
                             </button>
                         @endif
@@ -398,7 +456,10 @@
                     </div>
                     @if($this->order && $this->order->discount > 0)
                         <div class="flex justify-between text-sm text-green-600">
-                            <span>{{ __('Discount') }}</span>
+                            <span class="flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/></svg>
+                                {{ __('Discount') }}
+                            </span>
                             <span class="font-medium">-${{ number_format($this->order->discount, 2) }}</span>
                         </div>
                     @endif
@@ -411,8 +472,10 @@
                 {{-- Pay Button --}}
                 <div class="px-5 pb-4">
                     <button wire:click="openPaymentModal"
-                        class="w-full bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold py-3.5 rounded-xl transition-colors text-base shadow-sm shadow-amber-200">
+                        class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 active:from-amber-700 active:to-amber-800 text-white font-bold py-3.5 rounded-xl transition-all text-base shadow-md shadow-amber-200/50 flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
                         {{ __('Pay') }} ${{ number_format($this->total, 2) }}
+                        <kbd class="text-[10px] font-mono bg-white/20 px-1.5 py-0.5 rounded">F2</kbd>
                     </button>
                 </div>
             </div>
@@ -664,7 +727,12 @@
                 x-transition:enter-end="opacity-100 scale-100">
                 <div class="p-6">
                     <div class="flex items-center justify-between mb-5">
-                        <h3 class="text-lg font-bold text-stone-800">{{ __('Payment') }}</h3>
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-9 h-9 bg-amber-100 rounded-xl flex items-center justify-center">
+                                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-stone-800">{{ __('Payment') }}</h3>
+                        </div>
                         <span class="text-2xl font-bold text-amber-600">${{ number_format($this->total, 2) }}</span>
                     </div>
 
@@ -673,16 +741,16 @@
                         <label class="block text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2">{{ __('Method') }}</label>
                         <div class="grid grid-cols-{{ $this->isKhqrAvailable ? 2 : 1 }} gap-3">
                             <button wire:click="selectPaymentMethod('cash')"
-                                class="py-3.5 px-4 rounded-xl border-2 text-sm font-semibold transition-all flex flex-row items-center justify-center gap-2
-                                    {{ $paymentMethod === 'cash' ? 'border-amber-500 bg-amber-50 text-amber-700 ring-1 ring-amber-500' : 'border-stone-200 hover:border-stone-300 text-stone-600' }}">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                class="py-3.5 px-4 rounded-xl border-2 text-sm font-semibold transition-all flex flex-col items-center justify-center gap-1.5
+                                    {{ $paymentMethod === 'cash' ? 'border-green-500 bg-green-50 text-green-700 ring-1 ring-green-200' : 'border-stone-200 hover:border-stone-300 text-stone-600 hover:bg-stone-50' }}">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
                                 {{ __('Cash') }}
                             </button>
                             @if($this->isKhqrAvailable)
                                 <button wire:click="selectPaymentMethod('khqr')"
-                                    class="py-3.5 px-4 rounded-xl border-2 text-sm font-semibold transition-all flex flex-row items-center justify-center gap-2
-                                        {{ $paymentMethod === 'khqr' ? 'border-amber-500 bg-amber-50 text-amber-700 ring-1 ring-amber-500' : 'border-stone-200 hover:border-stone-300 text-stone-600' }}">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+                                    class="py-3.5 px-4 rounded-xl border-2 text-sm font-semibold transition-all flex flex-col items-center justify-center gap-1.5
+                                        {{ $paymentMethod === 'khqr' ? 'border-blue-500 bg-blue-50 text-blue-700 ring-1 ring-blue-200' : 'border-stone-200 hover:border-stone-300 text-stone-600 hover:bg-stone-50' }}">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M6.75 6.75h.75v.75h-.75v-.75zM6.75 16.5h.75v.75h-.75v-.75zM16.5 6.75h.75v.75h-.75v-.75zM13.5 13.5h.75v.75h-.75v-.75zM13.5 19.5h.75v.75h-.75v-.75zM19.5 13.5h.75v.75h-.75v-.75zM19.5 19.5h.75v.75h-.75v-.75zM16.5 16.5h.75v.75h-.75v-.75z"/></svg>
                                     {{ __('KHQR') }}
                                 </button>
                             @endif
@@ -718,10 +786,16 @@
                         <div class="mb-4">
                             <label class="block text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2">{{ __('Amount Tendered') }}</label>
                             <div class="relative">
-                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-stone-300">$</span>
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-stone-400">$</span>
                                 <input type="number" wire:model.live="amountTendered" step="0.01" min="0"
-                                    class="w-full pl-10 pr-4 py-3.5 border-2 border-stone-200 rounded-xl text-2xl font-bold text-center focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white"
+                                    class="w-full pl-10 pr-4 py-4 border-2 rounded-xl text-2xl font-bold text-center focus:ring-2 focus:ring-green-500/40 focus:border-green-400 bg-stone-50
+                                        {{ $amountTendered >= $this->total ? 'border-green-300 bg-green-50/50' : 'border-stone-200' }}"
                                     placeholder="0.00" x-ref="cashInput" x-init="$nextTick(() => $refs.cashInput.focus()); $refs.cashInput.select()">
+                                @if($amountTendered >= $this->total && $amountTendered > 0)
+                                    <div class="absolute right-4 top-1/2 -translate-y-1/2">
+                                        <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     @endif
@@ -771,6 +845,9 @@
                                 <svg wire:loading wire:target="processPayment" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
                                 <span wire:loading.remove wire:target="processPayment">
                                     {{ $amountTendered >= $this->total ? __('Complete Sale') : __('Pay') }} ${{ number_format(min($this->total, $amountTendered), 2) }}
+                                    @if($amountTendered >= $this->total)
+                                        <kbd class="text-[10px] font-mono bg-white/20 px-1.5 py-0.5 rounded ml-1">Enter</kbd>
+                                    @endif
                                 </span>
                                 <span wire:loading wire:target="processPayment">{{ __('Processing...') }}</span>
                             </button>
@@ -873,27 +950,39 @@
                 x-transition:enter-start="opacity-0 scale-95"
                 x-transition:enter-end="opacity-100 scale-100">
                 <div class="p-5">
-                    <div class="text-center mb-4">
-                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    <div class="text-center mb-4"
+                        x-data="{ show: false }" x-init="setTimeout(() => show = true, 100)">
+                        <div class="relative w-16 h-16 mx-auto mb-3">
+                            <div class="absolute inset-0 bg-green-100 rounded-full"
+                                x-show="show"
+                                x-transition:enter="transition ease-out duration-500"
+                                x-transition:enter-start="scale-0 opacity-0"
+                                x-transition:enter-end="scale-100 opacity-100"></div>
+                            <div class="absolute inset-0 flex items-center justify-center"
+                                x-show="show"
+                                x-transition:enter="transition ease-out duration-300 delay-200"
+                                x-transition:enter-start="scale-0"
+                                x-transition:enter-end="scale-100">
+                                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            </div>
                         </div>
-                        <h3 class="text-base font-bold text-stone-800">{{ __('Payment Complete') }}</h3>
-                        <p class="text-xs text-stone-400 mt-0.5">{{ __('Order has been processed successfully') }}</p>
+                        <h3 class="text-lg font-bold text-stone-800">{{ __('Payment Complete') }}</h3>
+                        <p class="text-xs text-stone-400 mt-1">{{ __('Order has been processed successfully') }}</p>
                     </div>
 
-                    <div class="bg-white rounded-xl p-3 font-mono text-xs leading-relaxed whitespace-pre-wrap text-stone-700 border border-stone-200 shadow-inner"
-                        x-data="{ printing: false }">
+                    <div class="bg-stone-50 rounded-xl p-3 font-mono text-xs leading-relaxed whitespace-pre-wrap text-stone-700 border border-stone-100 max-h-48 overflow-y-auto">
                         {{ $receiptContent }}
                     </div>
 
                     <div class="flex gap-2.5 mt-4">
                         <button wire:click="printReceipt"
                             class="flex-1 px-3 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl font-semibold transition-colors flex items-center justify-center gap-1.5 text-sm">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 18v4h12v-4M6 18v-2h12v2"/></svg>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"/></svg>
                             {{ __('Print') }}
                         </button>
                         <button wire:click="newOrder"
-                            class="flex-1 px-3 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold transition-colors shadow-sm shadow-amber-200 text-sm">
+                            class="flex-1 px-3 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl font-semibold transition-all shadow-sm shadow-amber-200/50 text-sm flex items-center justify-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                             {{ __('New Order') }}
                         </button>
                     </div>
@@ -933,12 +1022,23 @@
         class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
     >
         <div class="px-5 py-3 rounded-xl shadow-lg text-sm font-medium flex items-center gap-2"
-            :class="type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'">
+            :class="{
+                'bg-green-600 text-white': type === 'success',
+                'bg-red-600 text-white': type === 'error',
+                'bg-blue-600 text-white': type === 'info',
+                'bg-amber-500 text-white': type === 'warning'
+            }">
             <template x-if="type === 'success'">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
             </template>
             <template x-if="type === 'error'">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </template>
+            <template x-if="type === 'info'">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </template>
+            <template x-if="type === 'warning'">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
             </template>
             <span x-text="message"></span>
         </div>
