@@ -20,6 +20,9 @@ jobs:
           script: |
             cd /var/www/cafe-pos-shop
 
+            # Enable maintenance mode
+            php artisan down --secret="deploy-bypass-token"
+
             # Pull latest changes
             git pull origin main
 
@@ -41,5 +44,8 @@ jobs:
 
             # Restart queue workers if running
             php artisan queue:restart || true
+
+            # Disable maintenance mode
+            php artisan up
 
             echo "Deployment complete!"
