@@ -23,7 +23,7 @@ class OrderSequence extends Model
         self::upsert(
             [['date' => $date, 'last_sequence' => 1]],
             ['date'],
-            ['last_sequence' => DB::raw('last_sequence + 1')],
+            ['last_sequence' => DB::raw('order_sequences.last_sequence + 1')],
         );
 
         return (int) self::where('date', $date)->value('last_sequence');
